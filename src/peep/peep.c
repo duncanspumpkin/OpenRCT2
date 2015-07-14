@@ -135,6 +135,32 @@ void peep_update_all()
  */
 static void sub_68F41A(rct_peep *peep, int index)
 {
+	if (peep->type == PEEP_TYPE_STAFF){
+		if (peep->staff_type != STAFF_TYPE_SECURITY)
+			return;
+
+		uint8 sprite_type = 23;
+		if (peep->state != PEEP_STATE_PATROLLING)
+			sprite_type = 3;
+
+		if (peep->sprite_type == sprite_type)
+			return;
+
+		peep->sprite_type = sprite_type;
+		peep->action_sprite_image_offset = 0;
+		peep->no_action_frame_no = 0;
+		if (peep->action < PEEP_ACTION_NONE_1)
+			peep->action = PEEP_ACTION_NONE_2;
+
+		peep->flags &= ~PEEP_FLAGS_SLOW_WALK;
+		if (RCT2_ADDRESS(0x00982134, uint8)[sprite_type] & 1){
+			peep->flags |= PEEP_FLAGS_SLOW_WALK;
+		}
+
+		peep->action_sprite_type = 0xFF;
+		sub_693B58(peep);
+		return;
+	}
 	RCT2_CALLPROC_X(0x0068F41A, 0, 0, 0, index, (int)peep, 0, 0);
 }
 
