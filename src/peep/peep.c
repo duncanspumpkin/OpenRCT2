@@ -182,8 +182,8 @@ static void sub_68F41A(rct_peep *peep, int index)
 		if (peep->flags & PEEP_FLAGS_EXPLODE && peep->x != (sint16)0x8000){
 			sound_play_panned(SOUND_CRASH, 0x8001, peep->x, peep->y, peep->z);
 
-			RCT2_CALLPROC_X(0x0067363D, peep->x, 0, peep->y, peep->z + 16, (int)peep, 0, 0);
-			RCT2_CALLPROC_X(0x0067366B, peep->x, 0, peep->y, peep->z + 16, (int)peep, 0, 0);
+			sprite_misc_3_create(peep->x, peep->y, peep->z + 16);
+			sprite_misc_5_create(peep->x, peep->y, peep->z + 16);
 
 			peep_remove(peep);
 			return;
