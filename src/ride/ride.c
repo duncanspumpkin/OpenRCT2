@@ -6600,3 +6600,11 @@ void ride_crash(int rideIndex, int vehicleIndex)
 	RCT2_GLOBAL(RCT2_ADDRESS_COMMON_FORMAT_ARGS + 2, uint32) = ride->name_arguments;
 	news_item_add_to_queue(NEWS_ITEM_RIDE, STR_RIDE_HAS_CRASHED, rideIndex);
 }
+
+bool ride_type_is_intamin(int rideType)
+{
+	return
+		rideType == RIDE_TYPE_HEARTLINE_TWISTER_COASTER ||
+		rideType == RIDE_TYPE_GIGA_COASTER ||
+		rideType == RIDE_TYPE_INVERTED_IMPULSE_COASTER;
+}

@@ -5650,13 +5650,262 @@ static int sub_694921(rct_peep *peep, int x, int y)
 	return edx & 0xFFFF;
 }
 
+static bool peep_has_voucher_for_free_ride(rct_peep *peep, int rideIndex)
+{
+	return
+		peep->item_standard_flags & PEEP_ITEM_VOUCHER &&
+		peep->voucher_type == VOUCHER_TYPE_RIDE_FREE &&
+		peep->voucher_arguments == rideIndex;
+}
+
+static void peep_reset_ride_heading(rct_peep *peep)
+{
+	rct_window *w;
+
+	peep->guest_heading_to_ride_id = 255;
+	w = window_find_by_number(WC_PEEP, peep->sprite_index);
+	if (w != NULL) {
+		window_event_invalidate_call(w);
+		widget_invalidate(w, 12);
+	}
+}
+
 /**
  * 
  *  rct2: 0x006960AB
  */
 static bool sub_6960AB(rct_peep *peep, int rideIndex, int dh, int bp)
 {
-	return RCT2_CALLPROC_X(0x006960AB, 0, 0, 0, rideIndex | (dh << 8), (int)peep, 0, bp) & 0x100;
+	// return RCT2_CALLPROC_X(0x006960AB, 0, 0, 0, rideIndex | (dh << 8), (int)peep, 0, bp) & 0x100;
+
+	rct_ride *ride = GET_RIDE(rideIndex);
+	rct_ride_type *rideEntry;
+
+	if (!(RCT2_GLOBAL(RCT2_ADDRESS_PARK_FLAGS, uint32) & PARK_FLAGS_8)) {
+		if (ride->status == RIDE_STATUS_OPEN && !(ride->lifecycle_flags & RIDE_LIFECYCLE_BROKEN_DOWN)) {
+			if (!(RCT2_ADDRESS(0x0097D4F2, uint16)[ride->type * 8] & 0x1000) || ride->value == 0xFFFF || ride->price != 0) {
+				if (peep->flags & PEEP_FLAGS_LEAVING_PARK) {
+					goto loc_69666E;
+				}
+			}
+			if (RCT2_ADDRESS(0x0097CF40, uint32)[ride->type * 2] & 0x20000) {
+				if (rideIndex == peep->previous_ride) goto loc_69666E;
+				if (ride->type != RIDE_TYPE_CASH_MACHINE) {
+					if (ride->type == RIDE_TYPE_FIRST_AID) {
+						if (peep->nausea < 128) goto loc_69666E;
+						goto loc_69652C;
+					}
+					rideEntry = GET_RIDE_ENTRY(ride->subtype);
+					if (rideEntry->shop_item == 255) {
+						if (peep->bathroom < 70) goto loc_69666E;
+						money16 ax = ride->price * 40;
+						if ((ax >> 8) != 0 || (ax & 0xFF) > peep->bathroom) {
+							if (!(bp & 4)) {
+								peep_insert_new_thought(peep, PEEP_THOUGHT_TYPE_NOT_PAYING, rideIndex);
+								if (peep->happiness_growth_rate >= 60) {
+									peep->happiness_growth_rate -= 16;
+								}
+								ride_update_popularity(ride, 0);
+							}
+							goto loc_696658;
+						}
+					}
+
+					if (ride->price != 0) {
+						if (peep->cash_in_pocket <= 0) {
+							if (!(bp & 4)) {
+								peep_insert_new_thought(peep, PEEP_THOUGHT_TYPE_SPENT_MONEY, 255);
+							}
+							goto loc_696658;
+						}
+						if (ride->price > peep->cash_in_pocket) {
+							if (!(bp & 4)) {
+								peep_insert_new_thought(peep, PEEP_THOUGHT_TYPE_CANT_AFFORD_0, rideIndex);
+							}
+							goto loc_696658;
+						}
+					}
+				}
+
+			loc_69652C:
+				if (!(bp & 4)) {
+					ride_update_popularity(ride, 1);
+					if (rideIndex == peep->guest_heading_to_ride_id) {
+						peep_reset_ride_heading(peep);
+					}
+				}
+				return true;
+			}
+			if (bp & 2) {
+				if (ride->queue_length[dh] == 1000)
+					goto loc_696645;
+				if (!(bp & 1)) {
+					if (ride->first_peep_in_queue[dh] != 0xFFFF)
+						goto loc_696645;
+				} else {
+					if (ride->first_peep_in_queue[dh] != 0xFFFF) {
+						rct_peep *firstPeepInQueue = &(g_sprite_list[ride->first_peep_in_queue[dh]].peep);
+						if (abs(firstPeepInQueue->z - peep->z) <= 6) {
+							int dx = abs(firstPeepInQueue->x = peep->x);
+							int dy = abs(firstPeepInQueue->y - peep->y);
+							int maxD = max(dx, dy);
+							if (maxD <= 13) {
+								if (firstPeepInQueue->time_in_queue > 10)
+									goto loc_696645;
+								if (maxD < 8)
+									goto loc_696645;
+							}
+						}
+					}
+				}
+			}
+			if (!(RCT2_ADDRESS(0x0097D4F2, uint16)[ride->type * 8] & 0x1000) || ride->value == 0xFFFF || ride->price != 0) {
+				if (peep->previous_ride == rideIndex)
+					goto loc_69666E;
+				if (ride->price != 0 && !peep_has_voucher_for_free_ride(peep, rideIndex)) {
+					if (peep->cash_in_pocket <= 0) {
+						if (!(bp & 4)) {
+							peep_insert_new_thought(peep, PEEP_THOUGHT_TYPE_SPENT_MONEY, 255);
+						}
+						goto loc_696658;
+					}
+					if (ride->price > peep->cash_in_pocket) {
+						if (!(bp & 4)) {
+							peep_insert_new_thought(peep, PEEP_THOUGHT_TYPE_CANT_AFFORD_0, rideIndex);
+						}
+						goto loc_696658;
+					}
+				}
+				if (ride->last_crash_type != RIDE_CRASH_TYPE_NONE) {
+					if (peep->happiness < 225) {
+						if (!(bp & 4)) {
+							peep_insert_new_thought(peep, PEEP_THOUGHT_TYPE_NOT_SAFE, rideIndex);
+							if (peep->happiness_growth_rate >= 64) {
+								peep->happiness_growth_rate -= 8;
+							}
+							ride_update_popularity(ride, 0);
+						}
+						goto loc_696658;
+					}
+				}
+				if (ride->excitement != 0xFFFF) {
+					if (rideIndex == peep->guest_heading_to_ride_id) {
+						if (ride->intensity > RIDE_RATING(10, 00)) goto loc_6965F1;
+						goto loc_696387;
+					}
+					if (RCT2_GLOBAL(RCT2_ADDRESS_CURRENT_RAIN_LEVEL, uint8) != 0) {
+						if ((ride->var_114 >> 5) >= 3) goto loc_696387;
+						if (!(bp & 4)) {
+							peep_insert_new_thought(peep, PEEP_THOUGHT_TYPE_NOT_WHILE_RAINING, rideIndex);
+							if (peep->happiness_growth_rate >= 64) {
+								peep->happiness_growth_rate -= 8;
+							}
+							ride_update_popularity(ride, 0);
+						}
+						goto loc_696658;
+					}
+					ride_rating maxIntensity = min((peep->intensity >> 4) * 100, 1000) + peep->happiness;
+					ride_rating minIntensity = ((peep->intensity & 0x0F) * 100) - peep->happiness;
+					if (ride->intensity < minIntensity) {
+						if (!(bp & 4)) {
+							peep_insert_new_thought(peep, PEEP_THOUGHT_TYPE_MORE_THRILLING, rideIndex);
+							if (peep->happiness_growth_rate >= 64) {
+								peep->happiness_growth_rate -= 8;
+							}
+							ride_update_popularity(ride, 0);
+						}
+						goto loc_696658;
+					}
+					if (ride->intensity > maxIntensity) goto loc_6965F1;
+
+					ride_rating minNausea = RCT2_ADDRESS(0x00982390, uint16)[(peep->nausea_tolerance & 3) * 2] - peep->happiness;
+					ride_rating maxNausea = RCT2_ADDRESS(0x00982392, uint16)[(peep->nausea_tolerance & 3) * 2] + peep->happiness;
+					if (ride->nausea > maxNausea) {
+						if (!(bp & 4)) {
+							peep_insert_new_thought(peep, PEEP_THOUGHT_TYPE_SICKENING, rideIndex);
+							if (peep->happiness_growth_rate >= 64) {
+								peep->happiness_growth_rate -= 8;
+							}
+							ride_update_popularity(ride, 0);
+						}
+						goto loc_696658;
+					}
+					if (ride->nausea >= 140 && peep->nausea > 160) goto loc_69666E;
+					goto loc_696387;
+				}
+
+				if (RCT2_ADDRESS(0x0097D4F2, uint16)[ride->type * 8] & 0x10) {
+					if (scenario_rand() > 0x1999U) goto loc_69666E;
+					if (ride->max_positive_vertical_g > 500) goto loc_69666E;
+					if (ride->max_negative_vertical_g < -400) goto loc_69666E;
+					if (ride->max_lateral_g > 400) goto loc_69666E;
+				}
+
+			loc_696387:;
+				uint32 value = ride->value;
+				if (value != 0xFFFF && !peep_has_voucher_for_free_ride(peep, rideIndex)) {
+					if (peep->flags & PEEP_FLAGS_5) value /= 4;
+					if (ride->price > (money16)(value * 2)) {
+						if (bp & 4) goto loc_696658;
+						peep_insert_new_thought(peep, PEEP_THOUGHT_TYPE_BAD_VALUE, rideIndex);
+						if (peep->happiness_growth_rate < 60) {
+							peep->happiness_growth_rate -= 16;
+						}
+						ride_update_popularity(ride, 0);
+						goto loc_696658;
+					}
+					if (ride->price <= (money16)(value / 2) && bp == 4) {
+						if (!(RCT2_GLOBAL(RCT2_ADDRESS_PARK_FLAGS, uint32) & PARK_FLAGS_NO_MONEY)) {
+							if (RCT2_GLOBAL(RCT2_ADDRESS_PARK_FLAGS, uint32) & PARK_FLAGS_PARK_FREE_ENTRY) {
+								peep_insert_new_thought(peep, PEEP_THOUGHT_TYPE_GOOD_VALUE, rideIndex);
+							}
+						}
+					}
+				}
+			}
+
+			if (!(bp & 4)) {
+				ride_update_popularity(ride, 1);
+				if ((peep->flags & PEEP_FLAGS_27) && ride_type_is_intamin(ride->type)) {
+					peep_insert_new_thought(peep, PEEP_THOUGHT_EXCITED, 255);
+				}
+			}
+
+			if (rideIndex == peep->guest_heading_to_ride_id) {
+				peep_reset_ride_heading(peep);
+			}
+
+			ride->lifecycle_flags &= ~RIDE_LIFECYCLE_9;
+			return true;
+		}
+	}
+loc_69666E:
+	if (rideIndex == peep->guest_heading_to_ride_id) {
+		peep_reset_ride_heading(peep);
+	}
+	return false;
+
+loc_6965F1:
+	if (!(bp & 4)) {
+		peep_insert_new_thought(peep, PEEP_THOUGHT_TYPE_INTENSE, rideIndex);
+		if (peep->happiness_growth_rate >= 64) {
+			peep->happiness_growth_rate -= 8;
+		}
+		ride_update_popularity(ride, 0);
+	}
+	goto loc_696658;
+
+loc_696645:
+	ride->lifecycle_flags |= RIDE_LIFECYCLE_9;
+
+loc_696658:
+	if (!(bp & 4)) {
+		peep->previous_ride = rideIndex;
+		peep->previous_ride_time_out = 0;
+	}
+
+	peep_reset_ride_heading(peep);
+	return false;
 }
 
 /**
@@ -5762,8 +6011,8 @@ static void peep_pick_ride_to_go_on(rct_peep *peep)
 	rct_window *w = window_find_by_number(WC_PEEP, peep->sprite_index);
 	if (w != NULL) {
 		window_event_invalidate_call(w);
+		widget_invalidate(w, 12);
 	}
-	widget_invalidate_by_number(WC_RIDE, mostExcitingRideIndex, 23);
 
 	// Make peep look at their map if they have one
 	if (peep->item_standard_flags & PEEP_ITEM_MAP) {
@@ -5879,8 +6128,8 @@ static void peep_head_for_nearest_ride_type(rct_peep *peep, int rideType)
 	rct_window *w = window_find_by_number(WC_PEEP, peep->sprite_index);
 	if (w != NULL) {
 		window_event_invalidate_call(w);
+		widget_invalidate(w, 12);
 	}
-	widget_invalidate_by_number(WC_RIDE, closestRideIndex, 23);
 
 	peep->var_F4 = 0;
 }

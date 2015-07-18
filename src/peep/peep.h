@@ -40,6 +40,7 @@ enum PEEP_TYPE {
 };
 
 enum PEEP_THOUGHT_TYPE {
+	PEEP_THOUGHT_TYPE_CANT_AFFORD_0 = 0, // "I can't afford"
 	PEEP_THOUGHT_TYPE_SPENT_MONEY = 1, // "I've spent all my money"
 	PEEP_THOUGHT_TYPE_SICK = 2, // "I feel sick"
 	PEEP_THOUGHT_TYPE_VERY_SICK = 3, // "I feel very sick"
@@ -251,7 +252,7 @@ enum PEEP_FLAGS {
 
 	PEEP_FLAGS_TRACKING = (1 << 3),
 	PEEP_FLAGS_WAVING = (1 << 4), // Makes the peep wave
-
+	PEEP_FLAGS_5 = (1 << 5),
 	PEEP_FLAGS_PHOTO = (1 << 6), // Makes the peep take a picture
 	PEEP_FLAGS_PAINTING = (1 << 7),
 	PEEP_FLAGS_WOW = (1 << 8), // Makes a peep WOW2
@@ -271,7 +272,7 @@ enum PEEP_FLAGS {
 	PEEP_FLAGS_JOY = (1 << 23), // Makes the peep jump in joy
 	PEEP_FLAGS_ANGRY = (1 << 24),
 	PEEP_FLAGS_ICE_CREAM = (1 << 25), // Unconfirmed
-
+	PEEP_FLAGS_27 = (1 << 27),
 	PEEP_FLAGS_TWITCH = (1 << 31)		// Added for twitch integration
 };
 
