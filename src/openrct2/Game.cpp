@@ -97,7 +97,7 @@ static GAME_COMMAND_CALLBACK_POINTER * const game_command_callback_table[] = {
     nullptr,
     nullptr,
     nullptr,
-    game_command_callback_pickup_staff
+    nullptr
 };
 // clang-format on
 int32_t game_command_playerid = -1;
@@ -1223,7 +1223,7 @@ GAME_COMMAND_POINTER* new_game_command_table[GAME_COMMAND_COUNT] = {
     nullptr,
     nullptr,
     nullptr,
-    game_command_pickup_staff,
+    nullptr,
     nullptr,
     nullptr,
     nullptr,
