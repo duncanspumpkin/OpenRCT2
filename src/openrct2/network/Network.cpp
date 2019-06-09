@@ -14,6 +14,7 @@
 #include "../GameStateSnapshots.h"
 #include "../OpenRCT2.h"
 #include "../PlatformEnvironment.h"
+#include "../actions/PeepPickupAction.hpp"
 #include "../actions/LoadOrQuitAction.hpp"
 #include "../actions/NetworkModifyGroupAction.hpp"
 #include "../core/Guard.hpp"
@@ -2246,11 +2247,10 @@ void Network::ServerClientDisconnected(std::unique_ptr<NetworkConnection>& conne
     Peep* pickup_peep = network_get_pickup_peep(connection_player->Id);
     if (pickup_peep)
     {
-        game_command_playerid = connection_player->Id;
-        game_do_command(
-            pickup_peep->sprite_index, GAME_COMMAND_FLAG_APPLY, 1, 0,
-            pickup_peep->type == PEEP_TYPE_GUEST ? GAME_COMMAND_PICKUP_GUEST : GAME_COMMAND_PICKUP_STAFF,
-            network_get_pickup_peep_old_x(connection_player->Id), 0);
+        PeepPickupAction pickupAction{ PeepPickupType::Cancel,
+                                       pickup_peep->sprite_index,
+                                       { network_get_pickup_peep_old_x(connection_player->Id), 0, 0 } };
+        auto res = GameActions::Execute(&pickupAction);
     }
     gNetwork.Server_Send_EVENT_PLAYER_DISCONNECTED(
         (char*)connection_player->Name.c_str(), connection->GetLastDisconnectReason());

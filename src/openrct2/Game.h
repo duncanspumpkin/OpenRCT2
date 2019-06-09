@@ -85,7 +85,7 @@ enum GAME_COMMAND
     GAME_COMMAND_MODIFY_GROUPS,            // GA
     GAME_COMMAND_KICK_PLAYER,              // GA
     GAME_COMMAND_CHEAT,                    // GA
-    GAME_COMMAND_PICKUP_GUEST,
+    GAME_COMMAND_PICKUP_GUEST,             // GA
     GAME_COMMAND_PICKUP_STAFF,
     GAME_COMMAND_BALLOON_PRESS,           // GA
     GAME_COMMAND_MODIFY_TILE,             // GA

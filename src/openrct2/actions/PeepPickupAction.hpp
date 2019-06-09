@@ -11,9 +11,10 @@
 
 #include "../world/Sprite.h"
 #include "../network/network.h"
+#include "../Input.h"
 #include "GameAction.h"
 
-enum class PeepPickupType
+enum class PeepPickupType : uint8_t
 {
     Pickup,
     Cancel,
@@ -29,8 +30,9 @@ private:
     CoordsXYZ _loc;
 
 public:
+    PeepPickupAction() = default;
     PeepPickupAction(PeepPickupType type, uint32_t spriteId, CoordsXYZ loc)
-        : _type = static_cast<uint8_t>(type)
+        : _type(static_cast<uint8_t>(type))
     , _spriteId(spriteId)
     , _loc(loc)
     {
@@ -100,10 +102,14 @@ public:
                     return MakeResult(GA_ERROR::UNKNOWN, STR_ERR_CANT_PLACE_PERSON_HERE);
                 }
 
-                if (!peep->Place({ x / 32, y / 32, z }, false))
+                if (!peep->Place({ _loc.x / 32, _loc.y / 32, _loc.z }, false))
                 {
                     return MakeResult(GA_ERROR::UNKNOWN, STR_ERR_CANT_PLACE_PERSON_HERE, gGameCommandErrorText);
                 }
+                break;
+            default:
+                log_error("Invalid pickup type: %u", _type);
+                return MakeResult(GA_ERROR::INVALID_PARAMETERS, STR_ERR_CANT_PLACE_PERSON_HERE);
                 break;
         }
         return res;
@@ -152,22 +158,29 @@ public:
             }
             break;
             case PeepPickupType::Cancel:
+                {
                 res->Position = { peep->x, peep->y, peep->z };
                 // TODO: Verify if this is really needed or that we can use `peep` instead
                 Peep* const pickedUpPeep = network_get_pickup_peep(GetPlayer());
                 if (pickedUpPeep)
                 {
-                    pickedUpPeep->PickupAbort(x);
+                    pickedUpPeep->PickupAbort(_loc.x);
                 }
 
                 network_set_pickup_peep(GetPlayer(), nullptr);
+                }
                 break;
+                
             case PeepPickupType::Place:
                 res->Position = _loc;
-                if (!peep->Place({ x / 32, y / 32, z }, true))
+                if (!peep->Place({ _loc.x / 32, _loc.y / 32, _loc.z }, true))
                 {
                     return MakeResult(GA_ERROR::UNKNOWN, STR_ERR_CANT_PLACE_PERSON_HERE, gGameCommandErrorText);
                 }
+                break;
+            default:
+                log_error("Invalid pickup type: %u", _type);
+                return MakeResult(GA_ERROR::INVALID_PARAMETERS, STR_ERR_CANT_PLACE_PERSON_HERE);
                 break;
         }
         return res;

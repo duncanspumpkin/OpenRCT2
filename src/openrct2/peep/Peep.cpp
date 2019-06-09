@@ -928,24 +928,6 @@ bool peep_pickup_command(uint32_t peepnum, int32_t x, int32_t y, int32_t z, int3
     return true;
 }
 
-void game_command_pickup_guest(
-    int32_t* eax, int32_t* ebx, int32_t* ecx, int32_t* edx, [[maybe_unused]] int32_t* esi, int32_t* edi, int32_t* ebp)
-{
-    int32_t peepnum = *eax;
-    int32_t x = *edi;
-    int32_t y = *ebp;
-    int32_t z = *edx;
-    int32_t action = *ecx;
-    if (peep_pickup_command(peepnum, x, y, z, action, *ebx & GAME_COMMAND_FLAG_APPLY))
-    {
-        *ebx = 0;
-    }
-    else
-    {
-        *ebx = MONEY32_UNDEFINED;
-    }
-}
-
 /**
  *
  *  rct2: 0x0069A535
