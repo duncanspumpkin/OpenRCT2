@@ -1287,8 +1287,8 @@ void window_guest_overview_tool_down(rct_window* w, rct_widgetindex widgetIndex,
     if (dest_x == LOCATION_NULL)
         return;
 
-    PeepPickupAction pickupAction{ PeepPickupType::Place, w->number, {dest_x, dest_y, tileElement->base_height} };
-    pickupAction.SetCallback([peepnum = w->number](const GameAction* ga, const GameActionResult* result) {
+    PeepPickupAction pickupAction{ PeepPickupType::Place, w->number, { dest_x, dest_y, tileElement->base_height } };
+    pickupAction.SetCallback([](const GameAction* ga, const GameActionResult* result) {
         if (result->Error != GA_ERROR::OK)
             return;
         tool_cancel();

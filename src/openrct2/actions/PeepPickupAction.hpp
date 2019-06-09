@@ -9,9 +9,9 @@
 
 #pragma once
 
-#include "../world/Sprite.h"
-#include "../network/network.h"
 #include "../Input.h"
+#include "../network/network.h"
+#include "../world/Sprite.h"
 #include "GameAction.h"
 
 enum class PeepPickupType : uint8_t
@@ -33,8 +33,8 @@ public:
     PeepPickupAction() = default;
     PeepPickupAction(PeepPickupType type, uint32_t spriteId, CoordsXYZ loc)
         : _type(static_cast<uint8_t>(type))
-    , _spriteId(spriteId)
-    , _loc(loc)
+        , _spriteId(spriteId)
+        , _loc(loc)
     {
     }
 
@@ -84,7 +84,7 @@ public:
                                                            existing->sprite_index,
                                                            { network_get_pickup_peep_old_x(GetPlayer()), 0, 0 } };
                     auto result = GameActions::QueryNested(&existingPickupAction);
-                   
+
                     if (existing == peep)
                     {
                         return result;
@@ -158,7 +158,7 @@ public:
             }
             break;
             case PeepPickupType::Cancel:
-                {
+            {
                 res->Position = { peep->x, peep->y, peep->z };
                 // TODO: Verify if this is really needed or that we can use `peep` instead
                 Peep* const pickedUpPeep = network_get_pickup_peep(GetPlayer());
@@ -168,9 +168,8 @@ public:
                 }
 
                 network_set_pickup_peep(GetPlayer(), nullptr);
-                }
-                break;
-                
+            }
+            break;
             case PeepPickupType::Place:
                 res->Position = _loc;
                 if (!peep->Place({ _loc.x / 32, _loc.y / 32, _loc.z }, true))
