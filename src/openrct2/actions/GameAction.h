@@ -102,6 +102,7 @@ public:
     GameAction(uint32_t type)
         : _type(type)
     {
+        SetPlayer(network_get_current_player_id());
     }
 
     virtual ~GameAction() = default;
