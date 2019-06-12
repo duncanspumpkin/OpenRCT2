@@ -83,6 +83,7 @@ public:
                     PeepPickupAction existingPickupAction{ PeepPickupType::Cancel,
                                                            existing->sprite_index,
                                                            { network_get_pickup_peep_old_x(GetPlayer()), 0, 0 } };
+                    existingPickupAction.SetPlayer(GetPlayer());
                     auto result = GameActions::QueryNested(&existingPickupAction);
 
                     if (existing == peep)
@@ -139,6 +140,7 @@ public:
                     PeepPickupAction existingPickupAction{ PeepPickupType::Cancel,
                                                            existing->sprite_index,
                                                            { network_get_pickup_peep_old_x(GetPlayer()), 0, 0 } };
+                    existingPickupAction.SetPlayer(GetPlayer());
                     auto result = GameActions::ExecuteNested(&existingPickupAction);
 
                     if (existing == peep)
