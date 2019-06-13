@@ -28,13 +28,15 @@ private:
     uint8_t _type = static_cast<uint8_t>(PeepPickupType::Count);
     uint32_t _spriteId = SPRITE_INDEX_NULL;
     CoordsXYZ _loc;
+    NetworkPlayerId_t _owner = { -1 };
 
 public:
     PeepPickupAction() = default;
-    PeepPickupAction(PeepPickupType type, uint32_t spriteId, CoordsXYZ loc)
+    PeepPickupAction(PeepPickupType type, uint32_t spriteId, CoordsXYZ loc, NetworkPlayerId_t owner)
         : _type(static_cast<uint8_t>(type))
         , _spriteId(spriteId)
         , _loc(loc)
+        , _owner(owner)
     {
     }
 
@@ -47,7 +49,7 @@ public:
     {
         GameAction::Serialise(stream);
 
-        stream << DS_TAG(_type) << DS_TAG(_spriteId) << DS_TAG(_loc);
+        stream << DS_TAG(_type) << DS_TAG(_spriteId) << DS_TAG(_loc) << DS_TAG(_owner);
     }
 
     GameActionResult::Ptr Query() const override
@@ -76,14 +78,13 @@ public:
                 {
                     return MakeResult(GA_ERROR::DISALLOWED, STR_ERR_CANT_PLACE_PERSON_HERE);
                 }
-                Peep* existing = network_get_pickup_peep(GetPlayer());
+                Peep* existing = network_get_pickup_peep(_owner);
                 if (existing)
                 {
                     // already picking up a peep
-                    PeepPickupAction existingPickupAction{ PeepPickupType::Cancel,
-                                                           existing->sprite_index,
-                                                           { network_get_pickup_peep_old_x(GetPlayer()), 0, 0 } };
-                    existingPickupAction.SetPlayer(GetPlayer());
+                    PeepPickupAction existingPickupAction{
+                        PeepPickupType::Cancel, existing->sprite_index, { network_get_pickup_peep_old_x(_owner), 0, 0 }, _owner
+                    };
                     auto result = GameActions::QueryNested(&existingPickupAction);
 
                     if (existing == peep)
@@ -98,7 +99,7 @@ public:
                 break;
             case PeepPickupType::Place:
                 res->Position = _loc;
-                if (network_get_pickup_peep(GetPlayer()) != peep)
+                if (network_get_pickup_peep(_owner) != peep)
                 {
                     return MakeResult(GA_ERROR::UNKNOWN, STR_ERR_CANT_PLACE_PERSON_HERE);
                 }
@@ -133,29 +134,28 @@ public:
             {
                 res->Position = { peep->x, peep->y, peep->z };
 
-                Peep* existing = network_get_pickup_peep(GetPlayer());
+                Peep* existing = network_get_pickup_peep(_owner);
                 if (existing)
                 {
                     // already picking up a peep
-                    PeepPickupAction existingPickupAction{ PeepPickupType::Cancel,
-                                                           existing->sprite_index,
-                                                           { network_get_pickup_peep_old_x(GetPlayer()), 0, 0 } };
-                    existingPickupAction.SetPlayer(GetPlayer());
+                    PeepPickupAction existingPickupAction{
+                        PeepPickupType::Cancel, existing->sprite_index, { network_get_pickup_peep_old_x(_owner), 0, 0 }, _owner
+                    };
                     auto result = GameActions::ExecuteNested(&existingPickupAction);
 
                     if (existing == peep)
                     {
                         return result;
                     }
-                    if (GetPlayer() == network_get_current_player_id())
+                    if (_owner == network_get_current_player_id())
                     {
                         // prevent tool_cancel()
                         input_set_flag(INPUT_FLAG_TOOL_ACTIVE, false);
                     }
                 }
 
-                network_set_pickup_peep(GetPlayer(), peep);
-                network_set_pickup_peep_old_x(GetPlayer(), peep->x);
+                network_set_pickup_peep(_owner, peep);
+                network_set_pickup_peep_old_x(_owner, peep->x);
                 peep->Pickup();
             }
             break;
@@ -163,13 +163,13 @@ public:
             {
                 res->Position = { peep->x, peep->y, peep->z };
                 // TODO: Verify if this is really needed or that we can use `peep` instead
-                Peep* const pickedUpPeep = network_get_pickup_peep(GetPlayer());
+                Peep* const pickedUpPeep = network_get_pickup_peep(_owner);
                 if (pickedUpPeep)
                 {
                     pickedUpPeep->PickupAbort(_loc.x);
                 }
 
-                network_set_pickup_peep(GetPlayer(), nullptr);
+                network_set_pickup_peep(_owner, nullptr);
             }
             break;
             case PeepPickupType::Place:
