@@ -162,7 +162,7 @@ public:
             case PeepPickupType::Cancel:
             {
                 res->Position = { peep->x, peep->y, peep->z };
-                // TODO: Verify if this is really needed or that we can use `peep` instead
+
                 Peep* const pickedUpPeep = network_get_pickup_peep(_owner);
                 if (pickedUpPeep)
                 {
