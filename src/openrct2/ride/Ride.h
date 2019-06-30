@@ -193,6 +193,8 @@ struct RideMeasurement
     uint8_t altitude[MAX_ITEMS]{};
 };
 
+struct TrackDesign;
+
 /**
  * Ride structure.
  *
@@ -431,6 +433,8 @@ public:
 
     static void UpdateAll();
     static bool NameExists(const std::string_view& name, ride_id_t excludeRideId = RIDE_ID_NULL);
+
+    std::unique_ptr<TrackDesign> SaveToTrackDesign() const;
 };
 
 #pragma pack(push, 1)
@@ -1072,7 +1076,7 @@ void ride_remove_peeps(Ride* ride);
 void ride_clear_blocked_tiles(Ride* ride);
 Staff* ride_get_mechanic(Ride* ride);
 Staff* ride_get_assigned_mechanic(Ride* ride);
-int32_t ride_get_total_length(Ride* ride);
+int32_t ride_get_total_length(const Ride* ride);
 int32_t ride_get_total_time(Ride* ride);
 TrackColour ride_get_track_colour(Ride* ride, int32_t colourScheme);
 vehicle_colour ride_get_vehicle_colour(Ride* ride, int32_t vehicleIndex);
