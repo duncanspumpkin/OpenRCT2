@@ -28,6 +28,8 @@
 uint16_t gSpriteListHead[SPRITE_LIST_COUNT];
 uint16_t gSpriteListCount[SPRITE_LIST_COUNT];
 static rct_sprite _spriteList[MAX_SPRITES];
+std::array<std::vector<SpriteBase*>, SPRITE_LIST_COUNT> gSpriteLists;
+static std::vector<uint16_t> _freeSprites;
 
 static bool _spriteFlashingList[MAX_SPRITES];
 
@@ -359,27 +361,22 @@ static void SpriteSpatialInsert(SpriteBase* sprite, const CoordsXY& newLoc);
 
 static constexpr uint16_t MAX_MISC_SPRITES = 300;
 
-rct_sprite* create_sprite(SPRITE_IDENTIFIER spriteIdentifier, SPRITE_LIST linkedListIndex)
+void ResetFreeSpriteList()
 {
-    if (gSpriteListCount[SPRITE_LIST_FREE] == 0)
+    _freeSprites.clear();
+    for (auto id = 0; id < MAX_SPRITES; ++id)
     {
-        // No free sprites.
-        return nullptr;
-    }
-
-    if (linkedListIndex == SPRITE_LIST_MISC)
-    {
-        // Misc sprites are commonly used for effects, if there are less than MAX_MISC_SPRITES
-        // free it will fail to keep slots for more relevant sprites.
-        // Also there can't be more than MAX_MISC_SPRITES sprites in this list.
-        uint16_t miscSlotsRemaining = MAX_MISC_SPRITES - gSpriteListCount[SPRITE_LIST_MISC];
-        if (miscSlotsRemaining >= gSpriteListCount[SPRITE_LIST_FREE])
+        SpriteBase* sprite = &(get_sprite(id))->generic;
+        if (sprite->linked_list_index == SPRITE_LIST_FREE || sprite->sprite_identifier == SPRITE_IDENTIFIER_NULL)
         {
-            return nullptr;
+            _freeSprites.push_back(id);
         }
     }
+}
 
-    SpriteGeneric* sprite = &(get_sprite(gSpriteListHead[SPRITE_LIST_FREE]))->generic;
+SpriteBase* CreateSpriteAt(SPRITE_IDENTIFIER spriteIdentifier, SPRITE_LIST linkedListIndex, uint16_t spriteId)
+{
+    SpriteGeneric* sprite = &(get_sprite(spriteId))->generic;
 
     move_sprite_to_list(sprite, linkedListIndex);
 
@@ -398,7 +395,30 @@ rct_sprite* create_sprite(SPRITE_IDENTIFIER spriteIdentifier, SPRITE_LIST linked
 
     SpriteSpatialInsert(sprite, { LOCATION_NULL, 0 });
 
-    return reinterpret_cast<rct_sprite*>(sprite);
+    return sprite;
+}
+
+rct_sprite* create_sprite(SPRITE_IDENTIFIER spriteIdentifier, SPRITE_LIST linkedListIndex)
+{
+    if (gSpriteListCount[SPRITE_LIST_FREE] == 0)
+    {
+        // No free sprites.
+        return nullptr;
+    }
+
+    if (spriteIdentifier == SPRITE_IDENTIFIER_MISC)
+    {
+        // Misc sprites are commonly used for effects, if there are less than MAX_MISC_SPRITES
+        // free it will fail to keep slots for more relevant sprites.
+        // Also there can't be more than MAX_MISC_SPRITES sprites in this list.
+        uint16_t miscSlotsRemaining = MAX_MISC_SPRITES - gSpriteListCount[SPRITE_LIST_MISC];
+        if (miscSlotsRemaining >= gSpriteListCount[SPRITE_LIST_FREE])
+        {
+            return nullptr;
+        }
+    }
+    _freeSprites.pop_back();
+    return reinterpret_cast<rct_sprite*>(CreateSpriteAt(spriteIdentifier, linkedListIndex, gSpriteListHead[SPRITE_LIST_FREE]));
 }
 
 rct_sprite* create_sprite(SPRITE_IDENTIFIER spriteIdentifier)
@@ -733,6 +753,8 @@ void sprite_remove(SpriteBase* sprite)
     move_sprite_to_list(sprite, SPRITE_LIST_FREE);
     sprite->sprite_identifier = SPRITE_IDENTIFIER_NULL;
     _spriteFlashingList[sprite->sprite_index] = false;
+    _freeSprites.insert(
+        std::upper_bound(_freeSprites.begin(), _freeSprites.end(), sprite->sprite_identifier), sprite->sprite_identifier);
 
     size_t quadrantIndex = GetSpatialIndexOffset(sprite->x, sprite->y);
     uint16_t* spriteIndex = &gSpriteSpatialIndex[quadrantIndex];

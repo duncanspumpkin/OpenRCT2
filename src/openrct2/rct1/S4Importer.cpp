@@ -1108,6 +1108,7 @@ private:
         ImportPeeps();
         ImportLitter();
         ImportMiscSprites();
+        ResetFreeSpriteList();
     }
 
     void ImportVehicles()
