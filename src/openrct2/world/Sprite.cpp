@@ -374,11 +374,11 @@ void ResetFreeSpriteList()
     }
 }
 
-SpriteBase* CreateSpriteAt(SPRITE_IDENTIFIER spriteIdentifier, SPRITE_LIST linkedListIndex, uint16_t spriteId)
+// Create a sprite without touching the linked lists
+// It is up to the caller to fix the linked lists
+SpriteBase* CreateSpriteAt(uint16_t spriteId)
 {
-    SpriteGeneric* sprite = &(get_sprite(spriteId))->generic;
-
-    move_sprite_to_list(sprite, linkedListIndex);
+    SpriteBase* sprite = &(get_sprite(spriteId))->generic;
 
     // Need to reset all sprite data, as the uninitialised values
     // may contain garbage and cause a desync later on.
@@ -417,8 +417,14 @@ rct_sprite* create_sprite(SPRITE_IDENTIFIER spriteIdentifier, SPRITE_LIST linked
             return nullptr;
         }
     }
+
     _freeSprites.pop_back();
-    return reinterpret_cast<rct_sprite*>(CreateSpriteAt(spriteIdentifier, linkedListIndex, gSpriteListHead[SPRITE_LIST_FREE]));
+
+    auto entity = CreateSpriteAt(gSpriteListHead[SPRITE_LIST_FREE]);
+
+    move_sprite_to_list(entity, linkedListIndex);
+
+    return reinterpret_cast<rct_sprite*>(entity);
 }
 
 rct_sprite* create_sprite(SPRITE_IDENTIFIER spriteIdentifier)
@@ -442,6 +448,7 @@ rct_sprite* create_sprite(SPRITE_IDENTIFIER spriteIdentifier)
             Guard::Assert(false, "Invalid sprite identifier: 0x%02X", spriteIdentifier);
             return nullptr;
     }
+
     return create_sprite(spriteIdentifier, linkedListIndex);
 }
 
