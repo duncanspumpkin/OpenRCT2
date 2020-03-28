@@ -4324,8 +4324,7 @@ static Vehicle* vehicle_create_car(
         return nullptr;
 
     auto vehicleEntry = &rideEntry->vehicles[vehicleEntryIndex];
-    auto vehicle = &create_sprite(SPRITE_IDENTIFIER_VEHICLE, carIndex == 0 ? SPRITE_LIST_TRAIN_HEAD : SPRITE_LIST_VEHICLE)
-                        ->vehicle;
+    auto vehicle = reinterpret_cast<Vehicle*>(CreateSprite(carIndex == 0 ? SPRITE_LIST_TRAIN_HEAD : SPRITE_LIST_VEHICLE));
     if (vehicle == nullptr)
         return nullptr;
 
