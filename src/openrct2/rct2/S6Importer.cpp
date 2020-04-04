@@ -1267,8 +1267,7 @@ public:
         for (int32_t i = 0; i < RCT2_MAX_SPRITES; i++)
         {
             auto src = &_s6.sprites[i];
-            auto dst = CreateSpriteAt(i);
-            ImportSprite((rct_sprite*)dst, src);
+            ImportSprite(i, src);
         }
 
         for (int32_t i = 0; i < SPRITE_LIST_COUNT; i++)
@@ -1281,26 +1280,35 @@ public:
         ResetSpriteLists();
     }
 
-    void ImportSprite(rct_sprite* dst, const RCT2Sprite* src)
+    void ImportSprite(int32_t index, const RCT2Sprite* src)
     {
-        // Todo: linked_list_index == FREE should be special cased to load a null
-        std::memset(&dst->pad_00, 0, sizeof(rct_sprite));
+        // Linked list type has higher precedence than sprite_identifier type
+        if (src->unknown.linked_list_type_offset >> 1 == SPRITE_LIST_FREE)
+        {
+            auto dst = CreateSpriteAt(index);
+            ImportSpriteCommonProperties(dst, &src->unknown);
+            // This is not guaranteed to be set correctly in the source so overriding it.
+            dst->sprite_identifier = SPRITE_IDENTIFIER_NULL;
+            return;
+        }
+
+        auto dst = CreateSpriteAt(index);
         switch (src->unknown.sprite_identifier)
         {
             case SPRITE_IDENTIFIER_NULL:
                 ImportSpriteCommonProperties(reinterpret_cast<SpriteBase*>(dst), &src->unknown);
                 break;
             case SPRITE_IDENTIFIER_VEHICLE:
-                ImportSpriteVehicle(&dst->vehicle, &src->vehicle);
+                ImportSpriteVehicle(reinterpret_cast<Vehicle*>(dst), &src->vehicle);
                 break;
             case SPRITE_IDENTIFIER_PEEP:
-                ImportSpritePeep(&dst->peep, &src->peep);
+                ImportSpritePeep(reinterpret_cast<Peep*>(dst), &src->peep);
                 break;
             case SPRITE_IDENTIFIER_MISC:
-                ImportSpriteMisc(&dst->generic, &src->unknown);
+                ImportSpriteMisc(dst, &src->unknown);
                 break;
             case SPRITE_IDENTIFIER_LITTER:
-                ImportSpriteLitter(&dst->litter, &src->litter);
+                ImportSpriteLitter(reinterpret_cast<Litter*>(dst), &src->litter);
                 break;
             default:
                 ImportSpriteCommonProperties(reinterpret_cast<SpriteBase*>(dst), reinterpret_cast<const RCT12SpriteBase*>(src));
