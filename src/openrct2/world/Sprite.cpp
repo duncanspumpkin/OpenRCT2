@@ -428,7 +428,7 @@ static void RemoveSpriteFromSpriteLists(SpriteBase* sprite)
         auto res = std::lower_bound(list.begin(), list.end(), sprite, [](const SpriteBase* a, SpriteBase* b) {
             return a->sprite_index < b->sprite_index;
         });
-        if (res != list.end())
+        if (res != list.end() && (*res)->sprite_index == sprite->sprite_index)
         {
             list.erase(res);
         }
@@ -833,6 +833,12 @@ void sprite_remove(SpriteBase* sprite)
         spriteIndex = &quadrantSprite->next_in_quadrant;
     }
     *spriteIndex = sprite->next_in_quadrant;
+
+    // Debug check
+    for (int i = 1; i < SPRITE_LIST_COUNT; ++i)
+    {
+        assert(gSpriteLists[i].size() == gSpriteListCount[i]);
+    }
 }
 
 static bool litter_can_be_at(int32_t x, int32_t y, int32_t z)

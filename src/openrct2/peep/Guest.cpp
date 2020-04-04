@@ -5481,7 +5481,6 @@ void Guest::UpdateWalking()
     for (rct_sprite* sprite; sprite_id != SPRITE_INDEX_NULL; sprite_id = sprite->generic.next_in_quadrant)
     {
         sprite = get_sprite(sprite_id);
-
         if (!sprite->IsPeep())
             continue;
 

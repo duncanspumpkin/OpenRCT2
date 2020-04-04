@@ -427,18 +427,11 @@ void peep_update_all()
         peep = GET_PEEP(spriteIndex);
         spriteIndex = peep->next;
 
-        if (static_cast<uint32_t>(i & 0x7F) != (gCurrentTicks & 0x7F))
-        {
-            peep->Update();
-        }
-        else
+        if (static_cast<uint32_t>(i & 0x7F) == (gCurrentTicks & 0x7F))
         {
             peep_128_tick_update(peep, i);
-            if (peep->sprite_identifier == SPRITE_IDENTIFIER_PEEP)
-            {
-                peep->Update();
-            }
         }
+        peep->Update();
 
         i++;
     }
