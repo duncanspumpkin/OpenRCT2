@@ -30,6 +30,7 @@ uint16_t gSpriteListCount[SPRITE_LIST_COUNT];
 static rct_sprite _spriteList[MAX_SPRITES];
 static std::array<std::vector<SpriteBase*>, SPRITE_LIST_COUNT> gSpriteLists;
 static std::vector<uint16_t> _freeSprites;
+static std::vector<uint16_t> _tobeFreedEntitys;
 
 static bool _spriteFlashingList[MAX_SPRITES];
 
@@ -806,39 +807,45 @@ void sprite_set_coordinates(int16_t x, int16_t y, int16_t z, SpriteBase* sprite)
     sprite->z = z;
 }
 
+// Called after all update functions to free the entity from all lists
+void EntityFreeDead()
+{
+    for (const auto& entityId : _tobeFreedEntitys)
+    {
+        auto entity = &get_sprite(entityId)->generic;
+        auto peep = (reinterpret_cast<rct_sprite*>(entity))->AsPeep();
+        if (peep != nullptr)
+        {
+            peep->SetName({});
+        }
+
+        RemoveSpriteFromSpriteLists(entity);
+        move_sprite_to_list(entity, SPRITE_LIST_FREE);
+        entity->sprite_identifier = SPRITE_IDENTIFIER_NULL;
+        _spriteFlashingList[entity->sprite_index] = false;
+        _freeSprites.insert(
+            std::upper_bound(_freeSprites.begin(), _freeSprites.end(), entity->sprite_identifier), entity->sprite_identifier);
+
+        size_t quadrantIndex = GetSpatialIndexOffset(entity->x, entity->y);
+        uint16_t* spriteIndex = &gSpriteSpatialIndex[quadrantIndex];
+        SpriteBase* quadrantSprite;
+        while (*spriteIndex != SPRITE_INDEX_NULL && (quadrantSprite = &get_sprite(*spriteIndex)->generic) != entity)
+        {
+            spriteIndex = &quadrantSprite->next_in_quadrant;
+        }
+        *spriteIndex = entity->next_in_quadrant;
+    }
+    _tobeFreedEntitys.clear();
+}
+
 /**
  *
  *  rct2: 0x0069EDB6
  */
 void sprite_remove(SpriteBase* sprite)
 {
-    auto peep = (reinterpret_cast<rct_sprite*>(sprite))->AsPeep();
-    if (peep != nullptr)
-    {
-        peep->SetName({});
-    }
-
-    RemoveSpriteFromSpriteLists(sprite);
-    move_sprite_to_list(sprite, SPRITE_LIST_FREE);
-    sprite->sprite_identifier = SPRITE_IDENTIFIER_NULL;
-    _spriteFlashingList[sprite->sprite_index] = false;
-    _freeSprites.insert(
-        std::upper_bound(_freeSprites.begin(), _freeSprites.end(), sprite->sprite_identifier), sprite->sprite_identifier);
-
-    size_t quadrantIndex = GetSpatialIndexOffset(sprite->x, sprite->y);
-    uint16_t* spriteIndex = &gSpriteSpatialIndex[quadrantIndex];
-    SpriteBase* quadrantSprite;
-    while (*spriteIndex != SPRITE_INDEX_NULL && (quadrantSprite = &get_sprite(*spriteIndex)->generic) != sprite)
-    {
-        spriteIndex = &quadrantSprite->next_in_quadrant;
-    }
-    *spriteIndex = sprite->next_in_quadrant;
-
-    // Debug check
-    for (int i = 1; i < SPRITE_LIST_COUNT; ++i)
-    {
-        assert(gSpriteLists[i].size() == gSpriteListCount[i]);
-    }
+    _tobeFreedEntitys.push_back(sprite->sprite_index);
+    sprite->isDead = true;
 }
 
 static bool litter_can_be_at(int32_t x, int32_t y, int32_t z)

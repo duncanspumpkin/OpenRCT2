@@ -209,6 +209,7 @@ SpriteBase* CreateSpriteAt(uint16_t spriteId);
 void reset_sprite_list();
 void reset_sprite_spatial_index();
 void ResetSpriteLists();
+void EntityFreeDead();
 const std::vector<SpriteBase*> GetSpriteList(SPRITE_LIST type);
 void sprite_clear_all_unused();
 void sprite_misc_update_all();

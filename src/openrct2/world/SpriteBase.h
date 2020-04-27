@@ -29,6 +29,7 @@ struct SpriteBase
     int16_t sprite_bottom;
 
     uint8_t sprite_direction;
+    bool isDead = false;
 };
 
 struct SpriteGeneric : SpriteBase
