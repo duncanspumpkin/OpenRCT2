@@ -357,7 +357,7 @@ declare global {
         readonly playerId: number;
         readonly type: number;
         readonly isClientOnly: boolean;
-        result?: boolean;
+        result: boolean;
     }
 
     /**
