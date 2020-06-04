@@ -65,6 +65,7 @@
 #include "world/Sprite.h"
 #include "world/Surface.h"
 #include "world/Water.h"
+#include "world/MapPathing.h"
 
 #include <algorithm>
 #include <cstdio>
@@ -589,6 +590,7 @@ void game_load_init()
 
     audio_stop_title_music();
     gGameSpeed = 1;
+    InitMapPathing();
 }
 
 void game_load_scripts()

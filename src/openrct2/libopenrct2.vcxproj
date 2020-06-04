@@ -433,6 +433,7 @@
     <ClInclude Include="world\MapAnimation.h" />
     <ClInclude Include="world\MapGen.h" />
     <ClInclude Include="world\MapHelpers.h" />
+    <ClInclude Include="world\MapPathing.h" />
     <ClInclude Include="world\Park.h" />
     <ClInclude Include="world\Scenery.h" />
     <ClInclude Include="world\ScenerySelection.h" />
@@ -752,6 +753,7 @@
     <ClCompile Include="world\MapAnimation.cpp" />
     <ClCompile Include="world\MapGen.cpp" />
     <ClCompile Include="world\MapHelpers.cpp" />
+    <ClCompile Include="world\MapPathing.cpp" />
     <ClCompile Include="world\MoneyEffect.cpp" />
     <ClCompile Include="world\Park.cpp" />
     <ClCompile Include="world\Particle.cpp" />

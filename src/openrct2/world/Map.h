@@ -16,6 +16,7 @@
 
 #include <initializer_list>
 #include <vector>
+#include <array>
 
 #define MINIMUM_LAND_HEIGHT 2
 #define MAXIMUM_LAND_HEIGHT 142
