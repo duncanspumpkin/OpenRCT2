@@ -14,8 +14,85 @@
 #include "world/EntityList.h"
 #include "world/Sprite.h"
 
+#include <deque>
+#include <tuple>
+
 static constexpr size_t MaximumGameStateSnapshots = 32;
 static constexpr uint32_t InvalidTick = 0xFFFFFFFF;
+static constexpr auto kNullIndex = std::numeric_limits<uint16_t>::max();
+
+template<typename T> struct EntityStorage
+{
+    std::deque<T> data;
+
+    template<typename... Args> T* create(Args&&... args)
+    {
+        auto it = std::find_if(data.begin(), data.end(), [](auto&& entry) { return entry.sprite_index == kNullIndex; });
+        if (it != data.end())
+        {
+            uint16_t index = static_cast<uint16_t>(std::distance(data.begin(), it));
+            *it = T{ std::forward<Args&&>(args)... };
+            (*it).sprite_index = index;
+            return &(*it);
+        }
+        else
+        {
+            uint16_t index = static_cast<uint16_t>(data.size());
+            auto& elem = data.emplace_back(std::forward<Args&&>(args)...);
+            elem.sprite_index = index;
+            return &elem;
+        }
+    }
+
+    void destroy(T* entity)
+    {
+        auto index = entity->sprite_index;
+        data[index].sprite_index = kNullIndex;
+        // Optimize end of list in case the end contains empty entries.
+        while (!data.empty() && data.back().index == kNullIndex)
+        {
+            data.pop_back();
+        }
+    }
+
+    T* get(uint16_t index)
+    {
+        if (index >= data.size())
+            return nullptr;
+        auto& elem = data[index];
+        if (elem.sprite_index == kNullIndex)
+            return nullptr;
+        return &elem;
+    }
+};
+
+template<typename... Args> struct EntityManager
+{
+    std::tuple<EntityStorage<Args>...> lists;
+
+    template<typename T> auto& getStorage()
+    {
+        return std::get<EntityStorage<T>>(lists);
+    }
+
+    template<typename T, typename... Args2> T* create(Args2&&... args)
+    {
+        auto& storage = getStorage<T>();
+        return storage.create(std::forward<Args2&&>(args)...);
+    }
+
+    template<typename T> void destroy(T* entity)
+    {
+        auto& storage = getStorage<T>();
+        return storage.destroy(entity);
+    }
+
+    template<typename T> T* get(uint16_t index)
+    {
+        auto& storage = getStorage<T>();
+        return storage.get(index);
+    }
+};
 
 struct GameStateSnapshot_t
 {
@@ -32,6 +109,51 @@ struct GameStateSnapshot_t
     OpenRCT2::MemoryStream storedSprites;
     OpenRCT2::MemoryStream parkParameters;
 
+    template<typename T, typename... Args>
+    void SerialiseEntity(EntityManager<Args...>& mgr, DataSerialiser& ds, bool saving)
+    {
+        EntityType entityType = T::cEntityType;
+        ds << entityType;
+        if (!saving && entityType != T::cEntityType)
+        {
+            log_error("Unexpected entity type in replay!");
+        }
+
+        uint16_t entitySize = sizeof(T);
+        ds << entitySize;
+        if (!saving && entitySize != sizeof(T))
+        {
+            log_error("Unexpected entity size in replay!");
+        }
+        uint16_t numEntities = static_cast<uint16_t>(mgr.getStorage<T>().data.size());
+
+        ds << numEntities;
+
+        for (auto i = 0; i < numEntities; ++i)
+        {
+            T* entity = nullptr;
+            if (saving)
+            {
+                entity = mgr.get<T>(i);
+            }
+            else
+            {
+                entity = mgr.create<T>();
+            }
+            ds << reinterpret_cast<uint8_t(&)[sizeof(T)]>(*entity);
+        }
+    }
+
+    template<typename... Args>
+    void SerialiseEntityManager(EntityManager<Args...>& mgr, bool saving)
+    {
+        const bool loading = !saving;
+
+        storedSprites.SetPosition(0);
+        DataSerialiser ds(saving, storedSprites);
+
+        (SerialiseEntity<Args>(mgr, ds, saving), ...);
+    }
     // Must pass a function that can access the sprite.
     void SerialiseSprites(std::function<rct_sprite*(const size_t)> getEntity, const size_t numSprites, bool saving)
     {
@@ -140,6 +262,13 @@ struct GameStateSnapshots final : public IGameStateSnapshots
 
     virtual void Capture(GameStateSnapshot_t& snapshot) override final
     {
+        EntityManager<Guest> mgr;
+        auto& str = mgr.getStorage<Guest>();
+        for (auto* g : EntityList<Guest>())
+        {
+            str.data.push_back(*g);
+        }
+        snapshot.SerialiseEntityManager(mgr, true);
         snapshot.SerialiseSprites(
             [](const size_t index) { return reinterpret_cast<rct_sprite*>(GetEntity(index)); }, MAX_ENTITIES, true);
 
