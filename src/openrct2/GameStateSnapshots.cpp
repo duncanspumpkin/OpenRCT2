@@ -141,9 +141,6 @@ struct GameStateSnapshot_t
     template<typename... Args>
     void SerialiseEntityManager(EntityManager<Args...>& mgr, bool saving)
     {
-        const bool loading = !saving;
-
-        storedSprites.SetPosition(0);
         DataSerialiser ds(saving, storedSprites);
 
         (SerialiseEntity<Args>(mgr, ds, saving), ...);
@@ -153,7 +150,6 @@ struct GameStateSnapshot_t
     {
         const bool loading = !saving;
 
-        storedSprites.SetPosition(0);
         DataSerialiser ds(saving, storedSprites);
 
         std::vector<uint32_t> indexTable;
@@ -262,6 +258,7 @@ struct GameStateSnapshots final : public IGameStateSnapshots
         {
             str.data.push_back(*g);
         }
+        snapshot.storedSprites.SetPosition(0);
         snapshot.SerialiseEntityManager(mgr, true);
         snapshot.SerialiseSprites(
             [](const size_t index) { return reinterpret_cast<rct_sprite*>(GetEntity(index)); }, MAX_ENTITIES, true);
@@ -289,9 +286,6 @@ struct GameStateSnapshots final : public IGameStateSnapshots
 
     std::vector<rct_sprite> BuildSpriteList(GameStateSnapshot_t& snapshot) const
     {
-        EntityManager<Guest> mgr;
-        snapshot.SerialiseEntityManager(mgr, false);
-
         std::vector<rct_sprite> spriteList;
         spriteList.resize(MAX_ENTITIES);
 
@@ -300,7 +294,9 @@ struct GameStateSnapshots final : public IGameStateSnapshots
             // By default they don't exist.
             sprite.misc.Type = EntityType::Null;
         }
-
+        snapshot.storedSprites.SetPosition(0);
+        EntityManager<Guest> mgr;
+        snapshot.SerialiseEntityManager(mgr, false);
         snapshot.SerialiseSprites([&spriteList](const size_t index) { return &spriteList[index]; }, MAX_ENTITIES, false);
 
         return spriteList;
