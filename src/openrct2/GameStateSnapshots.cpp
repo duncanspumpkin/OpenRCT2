@@ -119,12 +119,6 @@ struct GameStateSnapshot_t
             log_error("Unexpected entity type in replay!");
         }
 
-        uint16_t entitySize = sizeof(T);
-        ds << entitySize;
-        if (!saving && entitySize != sizeof(T))
-        {
-            log_error("Unexpected entity size in replay!");
-        }
         uint16_t numEntities = static_cast<uint16_t>(mgr.getStorage<T>().data.size());
 
         ds << numEntities;
@@ -140,7 +134,7 @@ struct GameStateSnapshot_t
             {
                 entity = mgr.create<T>();
             }
-            ds << reinterpret_cast<uint8_t(&)[sizeof(T)]>(*entity);
+            entity->Serialise(ds);
         }
     }
 
@@ -295,6 +289,9 @@ struct GameStateSnapshots final : public IGameStateSnapshots
 
     std::vector<rct_sprite> BuildSpriteList(GameStateSnapshot_t& snapshot) const
     {
+        EntityManager<Guest> mgr;
+        snapshot.SerialiseEntityManager(mgr, false);
+
         std::vector<rct_sprite> spriteList;
         spriteList.resize(MAX_ENTITIES);
 
