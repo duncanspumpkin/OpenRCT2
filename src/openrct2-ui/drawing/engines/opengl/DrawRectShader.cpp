@@ -163,9 +163,9 @@ void DrawRectShader::SetInstances(const RectCommandBatch& instances)
     glBindVertexArray(_vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, _vboInstances);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(DrawRectCommand) * instances.size(), instances.data(), GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(DrawRectCommand) * instances.Size(), instances.Data(), GL_STREAM_DRAW);
 
-    _instanceCount = static_cast<GLsizei>(instances.size());
+    _instanceCount = static_cast<GLsizei>(instances.Size());
 }
 
 void DrawRectShader::DrawInstances()

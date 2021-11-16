@@ -515,8 +515,8 @@ void OpenGLDrawingContext::Initialise()
 
 void OpenGLDrawingContext::Resize(int32_t width, int32_t height)
 {
-    _commandBuffers.lines.clear();
-    _commandBuffers.rects.clear();
+    _commandBuffers.lines.Clear();
+    _commandBuffers.rects.Clear();
 
     _drawRectShader->Use();
     _drawRectShader->SetScreenSize(width, height);
@@ -556,7 +556,7 @@ void OpenGLDrawingContext::FillRect(
     right += _offsetX;
     bottom += _offsetY;
 
-    DrawRectCommand& command = _commandBuffers.rects.allocate();
+    DrawRectCommand& command = _commandBuffers.rects.Allocate();
 
     command.clip = { _clipLeft, _clipTop, _clipRight, _clipBottom };
     command.texColourAtlas = 0;
@@ -591,7 +591,7 @@ void OpenGLDrawingContext::FilterRect(
     right += _offsetX;
     bottom += _offsetY;
 
-    DrawRectCommand& command = _commandBuffers.transparent.allocate();
+    DrawRectCommand& command = _commandBuffers.transparent.Allocate();
 
     command.clip = { _clipLeft, _clipTop, _clipRight, _clipBottom };
     command.texColourAtlas = 0;
@@ -609,7 +609,7 @@ void OpenGLDrawingContext::DrawLine(rct_drawpixelinfo* dpi, uint32_t colour, con
 {
     CalculcateClipping(dpi);
 
-    DrawLineCommand& command = _commandBuffers.lines.allocate();
+    DrawLineCommand& command = _commandBuffers.lines.Allocate();
 
     command.clip = { _clipLeft, _clipTop, _clipRight, _clipBottom };
     command.bounds = { line.GetX1() + _offsetX, line.GetY1() + _offsetY, line.GetX2() + _offsetX, line.GetY2() + _offsetY };
@@ -738,7 +738,7 @@ void OpenGLDrawingContext::DrawSprite(rct_drawpixelinfo* dpi, uint32_t image, in
 
     if (special || (image & IMAGE_TYPE_TRANSPARENT))
     {
-        DrawRectCommand& command = _commandBuffers.transparent.allocate();
+        DrawRectCommand& command = _commandBuffers.transparent.Allocate();
 
         command.clip = { _clipLeft, _clipTop, _clipRight, _clipBottom };
         command.texColourAtlas = texture.index;
@@ -753,7 +753,7 @@ void OpenGLDrawingContext::DrawSprite(rct_drawpixelinfo* dpi, uint32_t image, in
     }
     else
     {
-        DrawRectCommand& command = _commandBuffers.rects.allocate();
+        DrawRectCommand& command = _commandBuffers.rects.Allocate();
 
         command.clip = { _clipLeft, _clipTop, _clipRight, _clipBottom };
         command.texColourAtlas = texture.index;
@@ -817,7 +817,7 @@ void OpenGLDrawingContext::DrawSpriteRawMasked(
     right += _spriteOffset.x;
     bottom += _spriteOffset.y;
 
-    DrawRectCommand& command = _commandBuffers.rects.allocate();
+    DrawRectCommand& command = _commandBuffers.rects.Allocate();
 
     command.clip = { _clipLeft, _clipTop, _clipRight, _clipBottom };
     command.texColourAtlas = textureColour.index;
@@ -870,7 +870,7 @@ void OpenGLDrawingContext::DrawSpriteSolid(rct_drawpixelinfo* dpi, uint32_t imag
     right += _offsetX;
     bottom += _offsetY;
 
-    DrawRectCommand& command = _commandBuffers.rects.allocate();
+    DrawRectCommand& command = _commandBuffers.rects.Allocate();
 
     command.clip = { _clipLeft, _clipTop, _clipRight, _clipBottom };
     command.texColourAtlas = 0;
@@ -925,7 +925,7 @@ void OpenGLDrawingContext::DrawGlyph(rct_drawpixelinfo* dpi, uint32_t image, int
     right += _spriteOffset.x;
     bottom += _spriteOffset.y;
 
-    DrawRectCommand& command = _commandBuffers.rects.allocate();
+    DrawRectCommand& command = _commandBuffers.rects.Allocate();
 
     command.clip = { _clipLeft, _clipTop, _clipRight, _clipBottom };
     command.texColourAtlas = texture.index;
@@ -970,7 +970,7 @@ void OpenGLDrawingContext::DrawBitmap(
     right += _offsetX;
     bottom += _offsetY;
 
-    DrawRectCommand& command = _commandBuffers.rects.allocate();
+    DrawRectCommand& command = _commandBuffers.rects.Allocate();
 
     command.clip = { _clipLeft, _clipTop, _clipRight, _clipBottom };
     command.texColourAtlas = texture.index;
@@ -1001,18 +1001,18 @@ void OpenGLDrawingContext::FlushCommandBuffers()
 
 void OpenGLDrawingContext::FlushLines()
 {
-    if (_commandBuffers.lines.empty())
+    if (_commandBuffers.lines.Empty())
         return;
 
     _drawLineShader->Use();
     _drawLineShader->DrawInstances(_commandBuffers.lines);
 
-    _commandBuffers.lines.clear();
+    _commandBuffers.lines.Clear();
 }
 
 void OpenGLDrawingContext::FlushRectangles()
 {
-    if (_commandBuffers.rects.empty())
+    if (_commandBuffers.rects.Empty())
         return;
 
     OpenGLAPI::SetTexture(0, GL_TEXTURE_2D_ARRAY, _textureCache->GetAtlasesTexture());
@@ -1022,12 +1022,12 @@ void OpenGLDrawingContext::FlushRectangles()
     _drawRectShader->SetInstances(_commandBuffers.rects);
     _drawRectShader->DrawInstances();
 
-    _commandBuffers.rects.clear();
+    _commandBuffers.rects.Clear();
 }
 
 void OpenGLDrawingContext::HandleTransparency()
 {
-    if (_commandBuffers.transparent.empty())
+    if (_commandBuffers.transparent.Empty())
     {
         return;
     }
@@ -1057,7 +1057,7 @@ void OpenGLDrawingContext::HandleTransparency()
         _swapFramebuffer->ApplyTransparency(*_applyTransparencyShader, _textureCache->GetPaletteTexture());
     }
 
-    _commandBuffers.transparent.clear();
+    _commandBuffers.transparent.Clear();
 }
 
 void OpenGLDrawingContext::CalculcateClipping(rct_drawpixelinfo* dpi)

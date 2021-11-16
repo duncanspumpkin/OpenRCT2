@@ -27,15 +27,15 @@ public:
         : _numInstances(0)
     {
     }
-    [[nodiscard]] bool empty() const
+    [[nodiscard]] bool Empty() const
     {
         return _numInstances == 0;
     }
-    void clear()
+    void Clear()
     {
         _numInstances = 0;
     }
-    T& allocate()
+    T& Allocate()
     {
         if (_numInstances + 1 > _instances.size())
         {
@@ -43,7 +43,7 @@ public:
         }
         return _instances[_numInstances++];
     }
-    T& insert(const T& value)
+    T& Insert(const T& value)
     {
         if (_numInstances + 1 > _instances.size())
         {
@@ -51,11 +51,11 @@ public:
         }
         return _instances[_numInstances++] = value;
     }
-    [[nodiscard]] size_t size() const
+    [[nodiscard]] size_t Size() const
     {
         return _numInstances;
     }
-    const T* data() const
+    const T* Data() const
     {
         return _instances.data();
     }
@@ -64,27 +64,27 @@ public:
         return _instances.at(idx);
     }
 
-    typename std::vector<T>::iterator begin()
+    typename std::vector<T>::iterator Begin()
     {
         return _instances.begin();
     }
-    typename std::vector<T>::const_iterator begin() const
+    typename std::vector<T>::const_iterator Begin() const
     {
         return _instances.cbegin();
     }
-    typename std::vector<T>::const_iterator cbegin() const
+    typename std::vector<T>::const_iterator Cbegin() const
     {
         return _instances.cbegin();
     }
-    typename std::vector<T>::iterator end()
+    typename std::vector<T>::iterator End()
     {
         return _instances.begin() + _numInstances;
     }
-    typename std::vector<T>::const_iterator end() const
+    typename std::vector<T>::const_iterator End() const
     {
         return _instances.cbegin() + _numInstances;
     }
-    typename std::vector<T>::const_iterator cend() const
+    typename std::vector<T>::const_iterator Cend() const
     {
         return _instances.cbegin() + _numInstances;
     }

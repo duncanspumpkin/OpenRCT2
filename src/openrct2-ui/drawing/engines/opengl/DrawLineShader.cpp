@@ -103,9 +103,9 @@ void DrawLineShader::DrawInstances(const LineCommandBatch& instances)
     glBindVertexArray(_vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, _vboInstances);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(DrawLineCommand) * instances.size(), instances.data(), GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(DrawLineCommand) * instances.Size(), instances.Data(), GL_STREAM_DRAW);
 
-    glDrawArraysInstanced(GL_LINES, 0, 2, static_cast<GLsizei>(instances.size()));
+    glDrawArraysInstanced(GL_LINES, 0, 2, static_cast<GLsizei>(instances.Size()));
 }
 
 #endif /* DISABLE_OPENGL */

@@ -34,7 +34,7 @@ using SweepLine = std::vector<XData>;
 static inline SweepLine CreateXList(const RectCommandBatch& transparent)
 {
     SweepLine x_sweep;
-    x_sweep.reserve(transparent.size() * 2);
+    x_sweep.reserve(transparent.Size() * 2);
 
     for (const DrawRectCommand& command : transparent)
     {
