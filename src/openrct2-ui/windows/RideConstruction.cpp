@@ -23,7 +23,9 @@
 #include <openrct2/actions/TrackSetBrakeSpeedAction.h>
 #include <openrct2/audio/audio.h>
 #include <openrct2/config/Config.h>
+#include <openrct2/core/String.hpp>
 #include <openrct2/localisation/Localisation.h>
+#include <openrct2/localisation/LocalisationService.h>
 #include <openrct2/network/network.h>
 #include <openrct2/paint/tile_element/Paint.TileElement.h>
 #include <openrct2/platform/platform.h>
@@ -89,6 +91,7 @@ enum
     WIDX_SEAT_ROTATION_ANGLE_SPINNER_UP,
     WIDX_SEAT_ROTATION_ANGLE_SPINNER_DOWN,
     WIDX_SIMULATE,
+    WIDX_RIDE_TYPE_DROPDOWN,
 };
 
 validate_global_widx(WC_RIDE_CONSTRUCTION, WIDX_CONSTRUCT);
@@ -134,6 +137,7 @@ static rct_widget window_ride_construction_widgets[] = {
     MakeWidget        ({ 96, 120}, { 67,  41}, WindowWidgetType::Groupbox, WindowColour::Primary  , STR_RIDE_CONSTRUCTION_SEAT_ROT                                                               ),
     MakeSpinnerWidgets({101, 138}, { 58,  12}, WindowWidgetType::Spinner,  WindowColour::Secondary, 0,                                       STR_RIDE_CONSTRUCTION_SELECT_SEAT_ROTATION_ANGLE_TIP),
     MakeWidget        ({139, 338}, { 24,  24}, WindowWidgetType::FlatBtn,  WindowColour::Secondary, SPR_G2_SIMULATE,                         STR_SIMULATE_RIDE_TIP                               ),
+    MakeWidget({150, 338}, { 11,  12}, WindowWidgetType::Button,        WindowColour::Secondary, STR_DROPDOWN_GLYPH                                     ),
     WIDGETS_END,
 };
 // clang-format on
@@ -445,6 +449,7 @@ static money32 _trackPlaceCost;
 static bool _autoOpeningShop;
 static bool _autoRotatingShop;
 static uint8_t _currentlyShowingBrakeOrBoosterSpeed;
+static ride_type_t _rideType;
 
 static uint32_t _currentDisabledSpecialTrackPieces;
 
@@ -524,6 +529,8 @@ rct_window* WindowRideConstructionOpen()
         return context_open_window_view(WV_MAZE_CONSTRUCTION);
     }
 
+    _rideType = ride->type;
+
     auto w = WindowCreate(
         ScreenCoordsXY(0, 29), 166, 394, &window_ride_construction_events, WC_RIDE_CONSTRUCTION, WF_NO_AUTO_CLOSE);
 
@@ -536,7 +543,8 @@ rct_window* WindowRideConstructionOpen()
         | (1ULL << WIDX_CONSTRUCT) | (1ULL << WIDX_DEMOLISH) | (1ULL << WIDX_LEFT_CURVE_LARGE) | (1ULL << WIDX_PREVIOUS_SECTION)
         | (1ULL << WIDX_NEXT_SECTION) | (1ULL << WIDX_SIMULATE) | (1ULL << WIDX_ENTRANCE) | (1ULL << WIDX_EXIT)
         | (1ULL << WIDX_RIGHT_CURVE_LARGE) | (1ULL << WIDX_ROTATE) | (1ULL << WIDX_U_TRACK) | (1ULL << WIDX_O_TRACK)
-        | (1ULL << WIDX_SEAT_ROTATION_ANGLE_SPINNER_UP) | (1ULL << WIDX_SEAT_ROTATION_ANGLE_SPINNER_DOWN);
+        | (1ULL << WIDX_SEAT_ROTATION_ANGLE_SPINNER_UP) | (1ULL << WIDX_SEAT_ROTATION_ANGLE_SPINNER_DOWN)
+        | (1ULL << WIDX_RIDE_TYPE_DROPDOWN);
 
     WindowInitScrollWidgets(w);
 
@@ -1232,6 +1240,100 @@ static void WindowRideConstructionResize(rct_window* w)
     w->disabled_widgets = disabledWidgets;
 }
 
+// Used for sorting the ride type cheat dropdown.
+struct RideTypeLabel
+{
+    uint8_t ride_type_id;
+    rct_string_id label_id;
+    const char* label_string;
+};
+
+static int32_t RideDropdownDataLanguage = LANGUAGE_UNDEFINED;
+static std::vector<RideTypeLabel> RideDropdownData;
+
+static rct_string_id GetRideTypeNameForDropdown(uint8_t rideType)
+{
+    switch (rideType)
+    {
+        case RIDE_TYPE_1D:
+            return STR_RIDE_NAME_1D;
+        case RIDE_TYPE_1F:
+            return STR_RIDE_NAME_1F;
+        case RIDE_TYPE_22:
+            return STR_RIDE_NAME_22;
+        case RIDE_TYPE_50:
+            return STR_RIDE_NAME_50;
+        case RIDE_TYPE_52:
+            return STR_RIDE_NAME_52;
+        case RIDE_TYPE_53:
+            return STR_RIDE_NAME_53;
+        case RIDE_TYPE_54:
+            return STR_RIDE_NAME_54;
+        case RIDE_TYPE_55:
+            return STR_RIDE_NAME_55;
+        case RIDE_TYPE_59:
+            return STR_RIDE_NAME_59;
+        default:
+            return GetRideTypeDescriptor(rideType).Naming.Name;
+    }
+}
+
+static void PopulateRideTypeDropdown()
+{
+    auto& ls = OpenRCT2::GetContext()->GetLocalisationService();
+    if (RideDropdownDataLanguage == ls.GetCurrentLanguage())
+        return;
+
+    RideDropdownData.clear();
+
+    for (uint8_t i = 0; i < RIDE_TYPE_COUNT; i++)
+    {
+        auto name = GetRideTypeNameForDropdown(i);
+        RideDropdownData.push_back({ i, name, ls.GetString(name) });
+    }
+
+    std::sort(RideDropdownData.begin(), RideDropdownData.end(), [](auto& a, auto& b) {
+        return String::Compare(a.label_string, b.label_string, true) < 0;
+    });
+
+    RideDropdownDataLanguage = ls.GetCurrentLanguage();
+}
+
+static void WindowRideShowRideTypeDropdown(rct_window* w, rct_widget* widget)
+{
+    auto ride = get_ride(w->rideId);
+    if (ride == nullptr)
+        return;
+
+    PopulateRideTypeDropdown();
+
+    for (size_t i = 0; i < RideDropdownData.size(); i++)
+    {
+        gDropdownItemsFormat[i] = STR_DROPDOWN_MENU_LABEL;
+        gDropdownItemsArgs[i] = RideDropdownData[i].label_id;
+    }
+
+    rct_widget* dropdownWidget = widget - 1;
+    WindowDropdownShowText(
+        { w->windowPos.x + dropdownWidget->left, w->windowPos.y + dropdownWidget->top }, dropdownWidget->height() + 1,
+        w->colours[1], Dropdown::Flag::StayOpen, RIDE_TYPE_COUNT);
+
+    // Find the current ride type in the ordered list.
+    uint8_t pos = 0;
+    for (uint8_t i = 0; i < RIDE_TYPE_COUNT; i++)
+    {
+        if (RideDropdownData[i].ride_type_id == ride->type)
+        {
+            pos = i;
+            break;
+        }
+    }
+
+    gDropdownHighlightedIndex = pos;
+    gDropdownDefaultIndex = pos;
+    Dropdown::SetChecked(pos, true);
+}
+
 /**
  *
  *  rct2: 0x006C6E6A
@@ -1627,6 +1729,9 @@ static void WindowRideConstructionMousedown(rct_window* w, rct_widgetindex widge
                 }
             }
             break;
+        case WIDX_RIDE_TYPE_DROPDOWN:
+            WindowRideShowRideTypeDropdown(w, widget);
+            break;
     }
 }
 
@@ -1636,6 +1741,16 @@ static void WindowRideConstructionMousedown(rct_window* w, rct_widgetindex widge
  */
 static void WindowRideConstructionDropdown(rct_window* w, rct_widgetindex widgetIndex, int32_t dropdownIndex)
 {
+    if (widgetIndex == WIDX_RIDE_TYPE_DROPDOWN)
+    {
+        if (dropdownIndex != -1 && dropdownIndex < RIDE_TYPE_COUNT)
+        {
+            uint8_t rideLabelId = std::clamp(dropdownIndex, 0, RIDE_TYPE_COUNT - 1);
+            _rideType = RideDropdownData[rideLabelId].ride_type_id;
+        }
+
+        return;
+    }
     if (widgetIndex != WIDX_SPECIAL_TRACK_DROPDOWN)
         return;
     if (dropdownIndex == -1)
@@ -1796,7 +1911,7 @@ static void WindowRideConstructionConstruct(rct_window* w)
         return;
 
     auto trackPlaceAction = TrackPlaceAction(
-        rideIndex, trackType, ride->type, { trackPos, static_cast<uint8_t>(trackDirection) }, (properties)&0xFF,
+        rideIndex, trackType, _rideType, { trackPos, static_cast<uint8_t>(trackDirection) }, (properties)&0xFF,
         (properties >> 8) & 0x0F, (properties >> 12) & 0x0F, liftHillAndAlternativeState, false);
     if (_rideConstructionState == RideConstructionState::Back)
     {
@@ -2454,7 +2569,7 @@ static void Sub6CbcE2(
         _tempTrackTileElement.SetBaseZ(baseZ);
         _tempTrackTileElement.SetClearanceZ(clearanceZ);
         _tempTrackTileElement.AsTrack()->SetTrackType(trackType);
-        _tempTrackTileElement.AsTrack()->SetRideType(ride->type);
+        _tempTrackTileElement.AsTrack()->SetRideType(_rideType);
         _tempTrackTileElement.AsTrack()->SetSequenceIndex(trackBlock->index);
         _tempTrackTileElement.AsTrack()->SetHasCableLift(false);
         _tempTrackTileElement.AsTrack()->SetInverted((liftHillAndInvertedState & CONSTRUCTION_INVERTED_TRACK_SELECTED) != 0);
