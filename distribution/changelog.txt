@@ -1,5 +1,6 @@
 0.4.0 (in development)
 ------------------------------------------------------------------------
+- Feature: Duncan actually made another video!
 - Headline feature: [#10664] New save format with increased limits.
 - Feature: [#714] Allow up to 255 trains per ride.
 - Feature: [#2253] Path surfaces and railings can be mixed and matched, like in RCT1.
