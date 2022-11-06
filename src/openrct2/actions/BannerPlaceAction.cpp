@@ -11,6 +11,7 @@
 
 #include "../management/Finance.h"
 #include "../object/BannerObject.h"
+#include "../object/ObjectManagerMeta.h"
 #include "../world/Banner.h"
 #include "../world/MapAnimation.h"
 #include "../world/Scenery.h"
@@ -94,7 +95,7 @@ GameActions::Result BannerPlaceAction::Query() const
             GameActions::Status::InvalidParameters, STR_CANT_POSITION_THIS_HERE, STR_TOO_MANY_BANNERS_IN_GAME);
     }
 
-    auto* bannerEntry = GetBannerEntry(_bannerType);
+    auto* bannerEntry = OpenRCT2::ObjectManager::GetMeta<BannerSceneryEntry>(_bannerType);
     if (bannerEntry == nullptr)
     {
         log_error("Invalid banner object type. bannerType = ", _bannerType);
@@ -121,7 +122,7 @@ GameActions::Result BannerPlaceAction::Execute() const
             GameActions::Status::NoFreeElements, STR_CANT_POSITION_THIS_HERE, STR_TILE_ELEMENT_LIMIT_REACHED);
     }
 
-    auto* bannerEntry = GetBannerEntry(_bannerType);
+    auto* bannerEntry = OpenRCT2::ObjectManager::GetMeta<BannerSceneryEntry>(_bannerType);
     if (bannerEntry == nullptr)
     {
         log_error("Invalid banner object type. bannerType = ", _bannerType);

@@ -18,6 +18,8 @@
 #include "../localisation/Localisation.h"
 #include "../management/Finance.h"
 #include "../network/network.h"
+#include "../object/BannerObject.h"
+#include "../object/ObjectManagerMeta.h"
 #include "../object/WallObject.h"
 #include "../ride/Ride.h"
 #include "../ride/RideData.h"
@@ -314,12 +316,12 @@ Banner* BannerElement::GetBanner() const
     return ::GetBanner(GetIndex());
 }
 
-BannerSceneryEntry* BannerElement::GetEntry() const
+const BannerSceneryEntry* BannerElement::GetEntry() const
 {
     auto banner = GetBanner();
     if (banner != nullptr)
     {
-        return GetBannerEntry(banner->type);
+        return OpenRCT2::ObjectManager::GetMeta<BannerSceneryEntry>(banner->type);
     }
     return nullptr;
 }

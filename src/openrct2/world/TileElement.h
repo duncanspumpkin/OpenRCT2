@@ -601,7 +601,7 @@ private:
 #pragma clang diagnostic pop
 public:
     Banner* GetBanner() const;
-    BannerSceneryEntry* GetEntry() const;
+    const BannerSceneryEntry* GetEntry() const;
 
     BannerIndex GetIndex() const;
     void SetIndex(BannerIndex newIndex);

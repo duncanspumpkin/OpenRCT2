@@ -23,6 +23,7 @@
 #include "../entity/Fountain.h"
 #include "../localisation/Localisation.h"
 #include "../network/network.h"
+#include "../object/BannerObject.h"
 #include "../object/FootpathItemObject.h"
 #include "../object/LargeSceneryObject.h"
 #include "../object/ObjectList.h"
@@ -301,18 +302,6 @@ void SceneryRemoveGhostToolPlacement()
     }
 }
 
-BannerSceneryEntry* GetBannerEntry(ObjectEntryIndex entryIndex)
-{
-    BannerSceneryEntry* result = nullptr;
-    auto& objMgr = OpenRCT2::GetContext()->GetObjectManager();
-    auto obj = objMgr.GetLoadedObject(ObjectType::Banners, entryIndex);
-    if (obj != nullptr)
-    {
-        result = static_cast<BannerSceneryEntry*>(obj->GetLegacyData());
-    }
-    return result;
-}
-
 PathBitEntry* GetFootpathItemEntry(ObjectEntryIndex entryIndex)
 {
     PathBitEntry* result = nullptr;
@@ -401,7 +390,7 @@ static bool HasValidEntry(const ScenerySelection& item)
         case SCENERY_TYPE_LARGE:
             return OpenRCT2::ObjectManager::GetMeta<LargeSceneryEntry>(item.EntryIndex) != nullptr;
         case SCENERY_TYPE_BANNER:
-            return GetBannerEntry(item.EntryIndex) != nullptr;
+            return OpenRCT2::ObjectManager::GetMeta<BannerSceneryEntry>(item.EntryIndex) != nullptr;
         default:
             return false;
     }

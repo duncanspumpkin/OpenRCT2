@@ -571,7 +571,7 @@ public:
         {
             if (tabSelectedScenery.SceneryType == SCENERY_TYPE_BANNER)
             {
-                auto* bannerEntry = GetBannerEntry(tabSelectedScenery.EntryIndex);
+                auto* bannerEntry = OpenRCT2::ObjectManager::GetMeta<BannerSceneryEntry>(tabSelectedScenery.EntryIndex);
                 if (bannerEntry->flags & BANNER_ENTRY_FLAG_HAS_PRIMARY_COLOUR)
                 {
                     widgets[WIDX_SCENERY_PRIMARY_COLOUR_BUTTON].type = WindowWidgetType::ColourBtn;
@@ -812,7 +812,7 @@ public:
         // banners
         for (ObjectEntryIndex sceneryId = 0; sceneryId < MAX_BANNER_OBJECTS; sceneryId++)
         {
-            const auto* sceneryEntry = GetBannerEntry(sceneryId);
+            const auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<BannerSceneryEntry>(sceneryId);
             if (sceneryEntry != nullptr)
             {
                 InitSceneryEntry({ SCENERY_TYPE_BANNER, sceneryId }, sceneryEntry->scenery_tab_id);
@@ -1168,7 +1168,7 @@ private:
                 }
                 case SCENERY_TYPE_BANNER:
                 {
-                    auto* sceneryEntry = GetBannerEntry(selectedScenery.EntryIndex);
+                    auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<BannerSceneryEntry>(selectedScenery.EntryIndex);
                     if (sceneryEntry != nullptr)
                     {
                         price = sceneryEntry->price;
@@ -1200,7 +1200,7 @@ private:
     {
         if (scenerySelection.SceneryType == SCENERY_TYPE_BANNER)
         {
-            auto bannerEntry = GetBannerEntry(scenerySelection.EntryIndex);
+            auto bannerEntry = OpenRCT2::ObjectManager::GetMeta<BannerSceneryEntry>(scenerySelection.EntryIndex);
             auto imageId = ImageId(bannerEntry->image + gWindowSceneryRotation * 2, gWindowSceneryPrimaryColour);
             gfx_draw_sprite(&dpi, imageId, { 33, 40 });
             gfx_draw_sprite(&dpi, imageId.WithIndexOffset(1), { 33, 40 });

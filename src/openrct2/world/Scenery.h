@@ -75,11 +75,9 @@ void SceneryUpdateTile(const CoordsXY& sceneryPos);
 void ScenerySetDefaultPlacementConfiguration();
 void SceneryRemoveGhostToolPlacement();
 
-struct BannerSceneryEntry;
 struct PathBitEntry;
 struct rct_scenery_group_entry;
 
-BannerSceneryEntry* GetBannerEntry(ObjectEntryIndex entryIndex);
 PathBitEntry* GetFootpathItemEntry(ObjectEntryIndex entryIndex);
 rct_scenery_group_entry* GetSceneryGroupEntry(ObjectEntryIndex entryIndex);
 

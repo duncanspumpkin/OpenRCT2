@@ -1079,7 +1079,7 @@ static void RepaintSceneryToolDown(const ScreenCoordsXY& windowPos, WidgetIndex 
             auto banner = info.Element->AsBanner()->GetBanner();
             if (banner != nullptr)
             {
-                auto* bannerEntry = GetBannerEntry(banner->type);
+                auto* bannerEntry = OpenRCT2::ObjectManager::GetMeta<BannerSceneryEntry>(banner->type);
                 if (bannerEntry->flags & BANNER_ENTRY_FLAG_HAS_PRIMARY_COLOUR)
                 {
                     auto repaintScenery = BannerSetColourAction(
@@ -1148,7 +1148,7 @@ static void SceneryEyedropperToolDown(const ScreenCoordsXY& windowPos, WidgetInd
             auto banner = info.Element->AsBanner()->GetBanner();
             if (banner != nullptr)
             {
-                auto sceneryEntry = GetBannerEntry(banner->type);
+                auto sceneryEntry = OpenRCT2::ObjectManager::GetMeta<BannerSceneryEntry>(banner->type);
                 if (sceneryEntry != nullptr)
                 {
                     WindowScenerySetSelectedItem(
