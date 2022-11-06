@@ -433,7 +433,8 @@ public:
                 }
                 else if (tabSelectedScenery.SceneryType == SCENERY_TYPE_PATH_ITEM)
                 { // path bit
-                    gCurrentToolId = static_cast<Tool>(GetFootpathItemEntry(tabSelectedScenery.EntryIndex)->tool_id);
+                    gCurrentToolId = static_cast<Tool>(
+                        OpenRCT2::ObjectManager::GetMeta<PathBitEntry>(tabSelectedScenery.EntryIndex)->tool_id);
                 }
                 else
                 { // small scenery
@@ -822,7 +823,7 @@ public:
         // path bits
         for (ObjectEntryIndex sceneryId = 0; sceneryId < MAX_PATH_ADDITION_OBJECTS; sceneryId++)
         {
-            const auto* sceneryEntry = GetFootpathItemEntry(sceneryId);
+            const auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<PathBitEntry>(sceneryId);
             if (sceneryEntry != nullptr)
             {
                 InitSceneryEntry({ SCENERY_TYPE_PATH_ITEM, sceneryId }, sceneryEntry->scenery_tab_id);
@@ -1138,7 +1139,7 @@ private:
                 }
                 case SCENERY_TYPE_PATH_ITEM:
                 {
-                    auto* sceneryEntry = GetFootpathItemEntry(selectedScenery.EntryIndex);
+                    auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<PathBitEntry>(selectedScenery.EntryIndex);
                     if (sceneryEntry != nullptr)
                     {
                         price = sceneryEntry->price;
@@ -1255,7 +1256,7 @@ private:
         }
         else if (scenerySelection.SceneryType == SCENERY_TYPE_PATH_ITEM)
         {
-            auto* pathBitEntry = GetFootpathItemEntry(scenerySelection.EntryIndex);
+            auto* pathBitEntry = OpenRCT2::ObjectManager::GetMeta<PathBitEntry>(scenerySelection.EntryIndex);
             auto imageId = ImageId(pathBitEntry->image);
             gfx_draw_sprite(&dpi, imageId, { 11, 16 });
         }

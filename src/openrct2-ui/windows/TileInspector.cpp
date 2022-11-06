@@ -1149,7 +1149,7 @@ public:
                     if (tileElement->AsPath()->HasAddition())
                     {
                         const auto pathAdditionType = tileElement->AsPath()->GetAdditionEntryIndex();
-                        const auto* pathBitEntry = GetFootpathItemEntry(pathAdditionType);
+                        const auto* pathBitEntry = OpenRCT2::ObjectManager::GetMeta<PathBitEntry>(pathAdditionType);
                         StringId additionNameId = pathBitEntry != nullptr ? pathBitEntry->name
                                                                           : static_cast<StringId>(STR_UNKNOWN_OBJECT_TYPE);
                         auto ft = Formatter();

@@ -22,11 +22,13 @@
 #include "../localisation/Localisation.h"
 #include "../management/Finance.h"
 #include "../network/network.h"
+#include "../object/FootpathItemObject.h"
 #include "../object/FootpathObject.h"
 #include "../object/FootpathRailingsObject.h"
 #include "../object/FootpathSurfaceObject.h"
 #include "../object/ObjectList.h"
 #include "../object/ObjectManager.h"
+#include "../object/ObjectManagerMeta.h"
 #include "../paint/VirtualFloor.h"
 #include "../ride/RideData.h"
 #include "../ride/Station.h"
@@ -1617,11 +1619,11 @@ ObjectEntryIndex PathElement::GetAdditionEntryIndex() const
     return GetAddition() - 1;
 }
 
-PathBitEntry* PathElement::GetAdditionEntry() const
+const PathBitEntry* PathElement::GetAdditionEntry() const
 {
     if (!HasAddition())
         return nullptr;
-    return GetFootpathItemEntry(GetAdditionEntryIndex());
+    return OpenRCT2::ObjectManager::GetMeta<PathBitEntry>(GetAdditionEntryIndex());
 }
 
 void PathElement::SetAddition(uint8_t newAddition)

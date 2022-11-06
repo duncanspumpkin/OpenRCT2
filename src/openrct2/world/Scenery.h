@@ -78,7 +78,6 @@ void SceneryRemoveGhostToolPlacement();
 struct PathBitEntry;
 struct rct_scenery_group_entry;
 
-PathBitEntry* GetFootpathItemEntry(ObjectEntryIndex entryIndex);
 rct_scenery_group_entry* GetSceneryGroupEntry(ObjectEntryIndex entryIndex);
 
 struct WallSceneryEntry;

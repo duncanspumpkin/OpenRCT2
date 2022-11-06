@@ -54,6 +54,7 @@
 #include <openrct2/localisation/Formatter.h>
 #include <openrct2/network/network.h>
 #include <openrct2/object/BannerObject.h>
+#include <openrct2/object/FootpathItemObject.h>
 #include <openrct2/object/LargeSceneryObject.h>
 #include <openrct2/object/ObjectManagerMeta.h>
 #include <openrct2/object/SmallSceneryObject.h>
@@ -1160,7 +1161,7 @@ static void SceneryEyedropperToolDown(const ScreenCoordsXY& windowPos, WidgetInd
         case ViewportInteractionItem::FootpathItem:
         {
             auto entryIndex = info.Element->AsPath()->GetAdditionEntryIndex();
-            auto* pathBitEntry = GetFootpathItemEntry(entryIndex);
+            auto* pathBitEntry = OpenRCT2::ObjectManager::GetMeta<PathBitEntry>(entryIndex);
             if (pathBitEntry != nullptr)
             {
                 WindowScenerySetSelectedItem(
