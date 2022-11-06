@@ -75,16 +75,15 @@ void SceneryUpdateTile(const CoordsXY& sceneryPos);
 void ScenerySetDefaultPlacementConfiguration();
 void SceneryRemoveGhostToolPlacement();
 
-struct WallSceneryEntry;
 struct BannerSceneryEntry;
 struct PathBitEntry;
 struct rct_scenery_group_entry;
 
-WallSceneryEntry* GetWallEntry(ObjectEntryIndex entryIndex);
 BannerSceneryEntry* GetBannerEntry(ObjectEntryIndex entryIndex);
 PathBitEntry* GetFootpathItemEntry(ObjectEntryIndex entryIndex);
 rct_scenery_group_entry* GetSceneryGroupEntry(ObjectEntryIndex entryIndex);
 
+struct WallSceneryEntry;
 int32_t WallEntryGetDoorSound(const WallSceneryEntry* wallEntry);
 
 bool IsSceneryAvailableToBuild(const ScenerySelection& item);

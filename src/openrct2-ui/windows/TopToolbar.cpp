@@ -1121,7 +1121,7 @@ static void SceneryEyedropperToolDown(const ScreenCoordsXY& windowPos, WidgetInd
         case ViewportInteractionItem::Wall:
         {
             auto entryIndex = info.Element->AsWall()->GetEntryIndex();
-            auto* sceneryEntry = GetWallEntry(entryIndex);
+            auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<WallSceneryEntry>(entryIndex);
             if (sceneryEntry != nullptr)
             {
                 WindowScenerySetSelectedItem(
@@ -1489,7 +1489,7 @@ static void Sub6E1F34Wall(
     auto screenPos = sourceScreenPos;
     uint16_t maxPossibleHeight = ZoomLevel::max().ApplyTo(std::numeric_limits<decltype(TileElement::base_height)>::max() - 32);
 
-    auto* wallEntry = GetWallEntry(sceneryIndex);
+    auto* wallEntry = OpenRCT2::ObjectManager::GetMeta<WallSceneryEntry>(sceneryIndex);
     if (wallEntry != nullptr)
     {
         maxPossibleHeight -= wallEntry->height;

@@ -516,7 +516,7 @@ private:
 public:
     uint16_t GetEntryIndex() const;
     void SetEntryIndex(uint16_t newIndex);
-    WallSceneryEntry* GetEntry() const;
+    const WallSceneryEntry* GetEntry() const;
 
     uint8_t GetSlope() const;
     void SetSlope(uint8_t newslope);

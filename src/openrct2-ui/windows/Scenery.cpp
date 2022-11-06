@@ -428,7 +428,8 @@ public:
                 }
                 else if (tabSelectedScenery.SceneryType == SCENERY_TYPE_WALL)
                 {
-                    gCurrentToolId = static_cast<Tool>(GetWallEntry(tabSelectedScenery.EntryIndex)->tool_id);
+                    gCurrentToolId = static_cast<Tool>(
+                        OpenRCT2::ObjectManager::GetMeta<WallSceneryEntry>(tabSelectedScenery.EntryIndex)->tool_id);
                 }
                 else if (tabSelectedScenery.SceneryType == SCENERY_TYPE_PATH_ITEM)
                 { // path bit
@@ -589,7 +590,7 @@ public:
             }
             else if (tabSelectedScenery.SceneryType == SCENERY_TYPE_WALL)
             {
-                auto* wallEntry = GetWallEntry(tabSelectedScenery.EntryIndex);
+                auto* wallEntry = OpenRCT2::ObjectManager::GetMeta<WallSceneryEntry>(tabSelectedScenery.EntryIndex);
                 if (wallEntry->flags & (WALL_SCENERY_HAS_PRIMARY_COLOUR | WALL_SCENERY_HAS_GLASS))
                 {
                     widgets[WIDX_SCENERY_PRIMARY_COLOUR_BUTTON].type = WindowWidgetType::ColourBtn;
@@ -801,7 +802,7 @@ public:
         // walls
         for (ObjectEntryIndex sceneryId = 0; sceneryId < MAX_WALL_SCENERY_OBJECTS; sceneryId++)
         {
-            const auto* sceneryEntry = GetWallEntry(sceneryId);
+            const auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<WallSceneryEntry>(sceneryId);
             if (sceneryEntry != nullptr)
             {
                 InitSceneryEntry({ SCENERY_TYPE_WALL, sceneryId }, sceneryEntry->scenery_tab_id);
@@ -1147,7 +1148,7 @@ private:
                 }
                 case SCENERY_TYPE_WALL:
                 {
-                    auto* sceneryEntry = GetWallEntry(selectedScenery.EntryIndex);
+                    auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<WallSceneryEntry>(selectedScenery.EntryIndex);
                     if (sceneryEntry != nullptr)
                     {
                         price = sceneryEntry->price;
@@ -1218,7 +1219,7 @@ private:
         }
         else if (scenerySelection.SceneryType == SCENERY_TYPE_WALL)
         {
-            auto wallEntry = GetWallEntry(scenerySelection.EntryIndex);
+            auto wallEntry = OpenRCT2::ObjectManager::GetMeta<WallSceneryEntry>(scenerySelection.EntryIndex);
             auto imageId = ImageId(wallEntry->image);
             auto spriteTop = (wallEntry->height * 2) + 0x32;
             if (wallEntry->flags & WALL_SCENERY_HAS_GLASS)

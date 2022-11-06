@@ -247,7 +247,7 @@ public:
 
         if (_isSmall)
         {
-            auto* wallEntry = GetWallEntry(_sceneryEntry);
+            auto* wallEntry = OpenRCT2::ObjectManager::GetMeta<WallSceneryEntry>(_sceneryEntry);
 
             main_colour_btn->type = WindowWidgetType::Empty;
             text_colour_btn->type = WindowWidgetType::Empty;
