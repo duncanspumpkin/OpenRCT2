@@ -26,6 +26,7 @@
 #include "../object/FootpathItemObject.h"
 #include "../object/ObjectList.h"
 #include "../object/ObjectManager.h"
+#include "../object/ObjectManagerMeta.h"
 #include "../object/SceneryGroupObject.h"
 #include "../object/SmallSceneryObject.h"
 #include "../object/TerrainSurfaceObject.h"
@@ -1030,7 +1031,7 @@ uint32_t staff_get_available_entertainer_costumes()
     {
         if (scenery_group_is_invented(i))
         {
-            const auto sgEntry = GetSceneryGroupEntry(i);
+            const auto sgEntry = OpenRCT2::ObjectManager::GetMeta<rct_scenery_group_entry>(i);
             entertainerCostumes |= sgEntry->entertainer_costumes;
         }
     }

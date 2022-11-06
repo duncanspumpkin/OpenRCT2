@@ -127,7 +127,7 @@ private:
 
         const rct_scenery_group_entry* GetSceneryGroupEntry() const
         {
-            return ::GetSceneryGroupEntry(SceneryGroupIndex);
+            return OpenRCT2::ObjectManager::GetMeta<rct_scenery_group_entry>(SceneryGroupIndex);
         }
     };
 
@@ -758,7 +758,7 @@ public:
 
         for (ObjectEntryIndex scenerySetIndex = 0; scenerySetIndex < MaxTabs - 1; scenerySetIndex++)
         {
-            const auto* sceneryGroupEntry = GetSceneryGroupEntry(scenerySetIndex);
+            const auto* sceneryGroupEntry = OpenRCT2::ObjectManager::GetMeta<rct_scenery_group_entry>(scenerySetIndex);
             if (sceneryGroupEntry != nullptr && scenery_group_is_invented(scenerySetIndex))
             {
                 SceneryTabInfo tabInfo;

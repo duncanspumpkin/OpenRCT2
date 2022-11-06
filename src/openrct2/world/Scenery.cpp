@@ -302,18 +302,6 @@ void SceneryRemoveGhostToolPlacement()
     }
 }
 
-rct_scenery_group_entry* GetSceneryGroupEntry(ObjectEntryIndex entryIndex)
-{
-    rct_scenery_group_entry* result = nullptr;
-    auto& objMgr = OpenRCT2::GetContext()->GetObjectManager();
-    auto obj = objMgr.GetLoadedObject(ObjectType::SceneryGroup, entryIndex);
-    if (obj != nullptr)
-    {
-        result = static_cast<rct_scenery_group_entry*>(obj->GetLegacyData());
-    }
-    return result;
-}
-
 int32_t WallEntryGetDoorSound(const WallSceneryEntry* wallEntry)
 {
     return (wallEntry->flags2 & WALL_SCENERY_2_DOOR_SOUND_MASK) >> WALL_SCENERY_2_DOOR_SOUND_SHIFT;
@@ -405,7 +393,7 @@ static std::vector<ScenerySelection> GetAllMiscScenery()
     std::vector<ScenerySelection> nonMiscScenery;
     for (ObjectEntryIndex i = 0; i < MAX_SCENERY_GROUP_OBJECTS; i++)
     {
-        const auto* sgEntry = GetSceneryGroupEntry(i);
+        const auto* sgEntry = OpenRCT2::ObjectManager::GetMeta<rct_scenery_group_entry>(i);
         if (sgEntry != nullptr)
         {
             nonMiscScenery.insert(nonMiscScenery.end(), sgEntry->SceneryEntries.begin(), sgEntry->SceneryEntries.end());
