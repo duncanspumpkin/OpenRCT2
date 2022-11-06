@@ -20,6 +20,7 @@
 #include <openrct2/localisation/Localisation.h>
 #include <openrct2/localisation/StringIds.h>
 #include <openrct2/object/LargeSceneryObject.h>
+#include <openrct2/object/ObjectManagerMeta.h>
 #include <openrct2/object/WallObject.h>
 #include <openrct2/sprites.h>
 #include <openrct2/world/Banner.h>
@@ -262,7 +263,7 @@ public:
         }
         else
         {
-            auto* sceneryEntry = GetLargeSceneryEntry(_sceneryEntry);
+            auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<LargeSceneryEntry>(_sceneryEntry);
 
             main_colour_btn->type = WindowWidgetType::Empty;
             text_colour_btn->type = WindowWidgetType::Empty;

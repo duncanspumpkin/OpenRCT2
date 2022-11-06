@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "ObjectType.h"
 #include "SceneryObject.h"
 
 enum class CursorID : uint8_t;
@@ -36,6 +37,8 @@ enum class PathBitDrawType : uint8_t
 
 struct PathBitEntry
 {
+    constexpr static auto kType = ObjectType::PathBits;
+
     StringId name;
     uint32_t image;
     uint16_t flags;

@@ -9,7 +9,30 @@
 
 #pragma once
 
-enum
+#include <cstdint>
+
+// First 0xF of rct_object_entry->flags
+enum class ObjectType : uint8_t
 {
-    LARGE_SCENERY_ELEMENT_FLAGS2_ACCOUNTED = 1 << 0,
+    Ride,
+    SmallScenery,
+    LargeScenery,
+    Walls,
+    Banners,
+    Paths,
+    PathBits,
+    SceneryGroup,
+    ParkEntrance,
+    Water,
+    ScenarioText,
+    TerrainSurface,
+    TerrainEdge,
+    Station,
+    Music,
+    FootpathSurface,
+    FootpathRailings,
+    Audio,
+
+    Count,
+    None = 255
 };

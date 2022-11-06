@@ -10,6 +10,7 @@
 #pragma once
 
 #include "../core/IStream.hpp"
+#include "ObjectType.h"
 #include "SceneryObject.h"
 
 enum
@@ -19,6 +20,8 @@ enum
 
 struct BannerSceneryEntry
 {
+    constexpr static auto kType = ObjectType::Banners;
+
     StringId name;
     uint32_t image;
     uint8_t scrolling_mode;

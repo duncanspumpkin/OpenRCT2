@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "ObjectType.h"
 #include "SceneryObject.h"
 
 #include <vector>
@@ -54,6 +55,8 @@ enum SMALL_SCENERY_FLAGS : uint32_t
 
 struct SmallSceneryEntry
 {
+    constexpr static auto kType = ObjectType::SmallScenery;
+
     StringId name;
     uint32_t image;
     uint32_t flags;

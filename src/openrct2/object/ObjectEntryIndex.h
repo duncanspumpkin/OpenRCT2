@@ -9,7 +9,8 @@
 
 #pragma once
 
-enum
-{
-    LARGE_SCENERY_ELEMENT_FLAGS2_ACCOUNTED = 1 << 0,
-};
+#include <cstdint>
+#include <limits>
+
+using ObjectEntryIndex = uint16_t;
+constexpr const ObjectEntryIndex OBJECT_ENTRY_INDEX_NULL = std::numeric_limits<ObjectEntryIndex>::max();

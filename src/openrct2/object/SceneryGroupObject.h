@@ -11,6 +11,7 @@
 
 #include "../world/ScenerySelection.h"
 #include "Object.h"
+#include "ObjectType.h"
 
 #include <vector>
 
@@ -20,6 +21,8 @@ enum class EntertainerCostume : uint8_t;
 
 struct rct_scenery_group_entry
 {
+    constexpr static auto kType = ObjectType::SceneryGroup;
+
     StringId name;
     uint32_t image;
     std::vector<ScenerySelection> SceneryEntries;

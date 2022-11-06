@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "ObjectType.h"
 #include "SceneryObject.h"
 
 #include <memory>
@@ -77,6 +78,8 @@ enum LARGE_SCENERY_TEXT_FLAGS
 
 struct LargeSceneryEntry
 {
+    constexpr static auto kType = ObjectType::LargeScenery;
+
     StringId name;
     uint32_t image;
     CursorID tool_id;

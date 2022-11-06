@@ -55,6 +55,7 @@
 #include <openrct2/network/network.h>
 #include <openrct2/object/BannerObject.h>
 #include <openrct2/object/LargeSceneryObject.h>
+#include <openrct2/object/ObjectManagerMeta.h>
 #include <openrct2/object/SmallSceneryObject.h>
 #include <openrct2/object/WallObject.h>
 #include <openrct2/paint/VirtualFloor.h>
@@ -1132,7 +1133,7 @@ static void SceneryEyedropperToolDown(const ScreenCoordsXY& windowPos, WidgetInd
         case ViewportInteractionItem::LargeScenery:
         {
             auto entryIndex = info.Element->AsLargeScenery()->GetEntryIndex();
-            auto* sceneryEntry = GetLargeSceneryEntry(entryIndex);
+            auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<LargeSceneryEntry>(entryIndex);
             if (sceneryEntry != nullptr)
             {
                 WindowScenerySetSelectedItem(
@@ -1577,7 +1578,7 @@ static void Sub6E1F34LargeScenery(
     auto screenPos = sourceScreenPos;
     uint16_t maxPossibleHeight = ZoomLevel::max().ApplyTo(std::numeric_limits<decltype(TileElement::base_height)>::max() - 32);
 
-    auto* sceneryEntry = GetLargeSceneryEntry(sceneryIndex);
+    auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<LargeSceneryEntry>(sceneryIndex);
     if (sceneryEntry)
     {
         int16_t maxClearZ = 0;
@@ -2821,7 +2822,7 @@ static void TopToolbarToolUpdateScenery(const ScreenCoordsXY& screenPos)
                 return;
             }
 
-            auto* sceneryEntry = GetLargeSceneryEntry(selection.EntryIndex);
+            auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<LargeSceneryEntry>(selection.EntryIndex);
             gMapSelectionTiles.clear();
 
             for (rct_large_scenery_tile* tile = sceneryEntry->tiles;

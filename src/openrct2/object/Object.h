@@ -15,6 +15,8 @@
 #include "../util/Util.h"
 #include "ImageTable.h"
 #include "ObjectAsset.h"
+#include "ObjectEntryIndex.h"
+#include "ObjectType.h"
 #include "StringTable.h"
 
 #include <array>
@@ -24,36 +26,8 @@
 #include <string_view>
 #include <vector>
 
-using ObjectEntryIndex = uint16_t;
-constexpr const ObjectEntryIndex OBJECT_ENTRY_INDEX_NULL = std::numeric_limits<ObjectEntryIndex>::max();
 struct ObjectRepositoryItem;
 using ride_type_t = uint16_t;
-
-// First 0xF of rct_object_entry->flags
-enum class ObjectType : uint8_t
-{
-    Ride,
-    SmallScenery,
-    LargeScenery,
-    Walls,
-    Banners,
-    Paths,
-    PathBits,
-    SceneryGroup,
-    ParkEntrance,
-    Water,
-    ScenarioText,
-    TerrainSurface,
-    TerrainEdge,
-    Station,
-    Music,
-    FootpathSurface,
-    FootpathRailings,
-    Audio,
-
-    Count,
-    None = 255
-};
 
 constexpr std::array ObjectTypes = {
     ObjectType::Ride,

@@ -13,6 +13,7 @@
 #include "../management/Finance.h"
 #include "../object/LargeSceneryObject.h"
 #include "../object/ObjectLimits.h"
+#include "../object/ObjectManagerMeta.h"
 #include "../ride/Ride.h"
 #include "../ride/RideConstruction.h"
 #include "../world/Banner.h"
@@ -80,7 +81,7 @@ GameActions::Result LargeSceneryPlaceAction::Query() const
         return GameActions::Result(GameActions::Status::InvalidParameters, STR_CANT_POSITION_THIS_HERE, STR_NONE);
     }
 
-    auto* sceneryEntry = GetLargeSceneryEntry(_sceneryType);
+    auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<LargeSceneryEntry>(_sceneryType);
     if (sceneryEntry == nullptr)
     {
         log_error("Invalid game command for scenery placement, sceneryType = %u", _sceneryType);
@@ -192,7 +193,7 @@ GameActions::Result LargeSceneryPlaceAction::Execute() const
 
     money32 supportsCost = 0;
 
-    auto* sceneryEntry = GetLargeSceneryEntry(_sceneryType);
+    auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<LargeSceneryEntry>(_sceneryType);
     if (sceneryEntry == nullptr)
     {
         log_error("Invalid game command for scenery placement, sceneryType = %u", _sceneryType);

@@ -9,7 +9,18 @@
 
 #pragma once
 
-enum
+#include "ObjectEntryIndex.h"
+
+enum class ObjectType : uint8_t;
+
+namespace OpenRCT2::ObjectManager
 {
-    LARGE_SCENERY_ELEMENT_FLAGS2_ACCOUNTED = 1 << 0,
-};
+    namespace Details
+    {
+        const void* GetMetaAny(ObjectType type, ObjectEntryIndex id);
+    }
+    template<typename T> const T* GetMeta(ObjectEntryIndex id)
+    {
+        return reinterpret_cast<const T*>(Details::GetMetaAny(T::kType, id));
+    }
+} // namespace OpenRCT2::ObjectManager

@@ -12,7 +12,7 @@
 #include "../Context.h"
 #include "../common.h"
 #include "../object/LargeSceneryObject.h"
-#include "../object/ObjectManager.h"
+#include "../object/ObjectManagerMeta.h"
 #include "../world/Banner.h"
 #include "TileElement.h"
 
@@ -86,9 +86,9 @@ ObjectEntryIndex LargeSceneryElement::GetEntryIndex() const
     return EntryIndex;
 }
 
-LargeSceneryEntry* LargeSceneryElement::GetEntry() const
+const LargeSceneryEntry* LargeSceneryElement::GetEntry() const
 {
-    return GetLargeSceneryEntry(GetEntryIndex());
+    return OpenRCT2::ObjectManager::GetMeta<LargeSceneryEntry>(GetEntryIndex());
 }
 
 const LargeSceneryObject* LargeSceneryElement::GetObject() const
@@ -109,16 +109,4 @@ void LargeSceneryElement::SetEntryIndex(ObjectEntryIndex newIndex)
 void LargeSceneryElement::SetSequenceIndex(uint8_t sequence)
 {
     SequenceIndex = sequence;
-}
-
-LargeSceneryEntry* GetLargeSceneryEntry(ObjectEntryIndex entryIndex)
-{
-    LargeSceneryEntry* result = nullptr;
-    auto& objMgr = OpenRCT2::GetContext()->GetObjectManager();
-    auto obj = objMgr.GetLoadedObject(ObjectType::LargeScenery, entryIndex);
-    if (obj != nullptr)
-    {
-        result = static_cast<LargeSceneryEntry*>(obj->GetLegacyData());
-    }
-    return result;
 }

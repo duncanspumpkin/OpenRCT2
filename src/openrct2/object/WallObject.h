@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "ObjectType.h"
 #include "SceneryObject.h"
 
 enum class CursorID : uint8_t;
@@ -36,6 +37,8 @@ enum WALL_SCENERY_2_FLAGS
 
 struct WallSceneryEntry
 {
+    constexpr static auto kType = ObjectType::Walls;
+
     StringId name;
     uint32_t image;
     CursorID tool_id;

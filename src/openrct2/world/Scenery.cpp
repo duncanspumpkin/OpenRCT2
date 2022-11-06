@@ -27,6 +27,7 @@
 #include "../object/LargeSceneryObject.h"
 #include "../object/ObjectList.h"
 #include "../object/ObjectManager.h"
+#include "../object/ObjectManagerMeta.h"
 #include "../object/SceneryGroupObject.h"
 #include "../object/SmallSceneryObject.h"
 #include "../object/WallObject.h"
@@ -410,7 +411,7 @@ static bool HasValidEntry(const ScenerySelection& item)
         case SCENERY_TYPE_WALL:
             return GetWallEntry(item.EntryIndex) != nullptr;
         case SCENERY_TYPE_LARGE:
-            return GetLargeSceneryEntry(item.EntryIndex) != nullptr;
+            return OpenRCT2::ObjectManager::GetMeta<LargeSceneryEntry>(item.EntryIndex) != nullptr;
         case SCENERY_TYPE_BANNER:
             return GetBannerEntry(item.EntryIndex) != nullptr;
         default:

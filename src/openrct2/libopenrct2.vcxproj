@@ -303,11 +303,14 @@
     <ClInclude Include="object\MusicObject.h" />
     <ClInclude Include="object\Object.h" />
     <ClInclude Include="object\ObjectAsset.h" />
+    <ClInclude Include="object\ObjectEntryIndex.h" />
     <ClInclude Include="object\ObjectFactory.h" />
     <ClInclude Include="object\ObjectLimits.h" />
     <ClInclude Include="object\ObjectList.h" />
     <ClInclude Include="object\ObjectManager.h" />
+    <ClInclude Include="object\ObjectManagerMeta.h" />
     <ClInclude Include="object\ObjectRepository.h" />
+    <ClInclude Include="object\ObjectType.h" />
     <ClInclude Include="object\ResourceTable.h" />
     <ClInclude Include="object\RideObject.h" />
     <ClInclude Include="object\SceneryGroupObject.h" />
@@ -795,6 +798,7 @@
     <ClCompile Include="object\ObjectFactory.cpp" />
     <ClCompile Include="object\ObjectList.cpp" />
     <ClCompile Include="object\ObjectManager.cpp" />
+    <ClCompile Include="object\ObjectManagerMeta.cpp" />
     <ClCompile Include="object\ObjectRepository.cpp" />
     <ClCompile Include="object\ResourceTable.cpp" />
     <ClCompile Include="object\RideObject.cpp" />

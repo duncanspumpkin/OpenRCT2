@@ -24,6 +24,7 @@
 #include <openrct2/object/FootpathItemObject.h>
 #include <openrct2/object/LargeSceneryObject.h>
 #include <openrct2/object/ObjectList.h>
+#include <openrct2/object/ObjectManagerMeta.h>
 #include <openrct2/object/SceneryGroupObject.h>
 #include <openrct2/object/SmallSceneryObject.h>
 #include <openrct2/object/WallObject.h>
@@ -422,7 +423,8 @@ public:
                 }
                 else if (tabSelectedScenery.SceneryType == SCENERY_TYPE_LARGE)
                 {
-                    gCurrentToolId = static_cast<Tool>(GetLargeSceneryEntry(tabSelectedScenery.EntryIndex)->tool_id);
+                    gCurrentToolId = static_cast<Tool>(
+                        OpenRCT2::ObjectManager::GetMeta<LargeSceneryEntry>(tabSelectedScenery.EntryIndex)->tool_id);
                 }
                 else if (tabSelectedScenery.SceneryType == SCENERY_TYPE_WALL)
                 {
@@ -575,7 +577,7 @@ public:
             }
             else if (tabSelectedScenery.SceneryType == SCENERY_TYPE_LARGE)
             {
-                auto* sceneryEntry = GetLargeSceneryEntry(tabSelectedScenery.EntryIndex);
+                auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<LargeSceneryEntry>(tabSelectedScenery.EntryIndex);
 
                 if (sceneryEntry->flags & LARGE_SCENERY_FLAG_HAS_PRIMARY_COLOUR)
                     widgets[WIDX_SCENERY_PRIMARY_COLOUR_BUTTON].type = WindowWidgetType::ColourBtn;
@@ -788,7 +790,7 @@ public:
         // large scenery
         for (ObjectEntryIndex sceneryId = 0; sceneryId < MAX_LARGE_SCENERY_OBJECTS; sceneryId++)
         {
-            const auto* sceneryEntry = GetLargeSceneryEntry(sceneryId);
+            const auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<LargeSceneryEntry>(sceneryId);
             if (sceneryEntry != nullptr)
             {
                 InitSceneryEntry({ SCENERY_TYPE_LARGE, sceneryId }, sceneryEntry->scenery_tab_id);
@@ -1154,7 +1156,7 @@ private:
                 }
                 case SCENERY_TYPE_LARGE:
                 {
-                    auto* sceneryEntry = GetLargeSceneryEntry(selectedScenery.EntryIndex);
+                    auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<LargeSceneryEntry>(selectedScenery.EntryIndex);
                     if (sceneryEntry != nullptr)
                     {
                         price = sceneryEntry->price;
@@ -1203,7 +1205,7 @@ private:
         }
         else if (scenerySelection.SceneryType == SCENERY_TYPE_LARGE)
         {
-            auto sceneryEntry = GetLargeSceneryEntry(scenerySelection.EntryIndex);
+            auto sceneryEntry = OpenRCT2::ObjectManager::GetMeta<LargeSceneryEntry>(scenerySelection.EntryIndex);
             auto imageId = ImageId(sceneryEntry->image + gWindowSceneryRotation);
             if (sceneryEntry->flags & LARGE_SCENERY_FLAG_HAS_PRIMARY_COLOUR)
                 imageId = imageId.WithPrimary(gWindowSceneryPrimaryColour);
