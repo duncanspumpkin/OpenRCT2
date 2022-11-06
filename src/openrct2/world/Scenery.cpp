@@ -405,7 +405,7 @@ static bool HasValidEntry(const ScenerySelection& item)
     switch (item.SceneryType)
     {
         case SCENERY_TYPE_SMALL:
-            return GetSmallSceneryEntry(item.EntryIndex) != nullptr;
+            return OpenRCT2::ObjectManager::GetMeta<SmallSceneryEntry>(item.EntryIndex) != nullptr;
         case SCENERY_TYPE_PATH_ITEM:
             return GetFootpathItemEntry(item.EntryIndex) != nullptr;
         case SCENERY_TYPE_WALL:

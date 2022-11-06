@@ -17,6 +17,7 @@
 #include "../localisation/Localisation.h"
 #include "../localisation/StringIds.h"
 #include "../management/Finance.h"
+#include "../object/ObjectManagerMeta.h"
 #include "../object/SmallSceneryObject.h"
 #include "../ride/Ride.h"
 #include "../ride/TrackDesign.h"
@@ -113,7 +114,7 @@ GameActions::Result SmallSceneryPlaceAction::Query() const
         return GameActions::Result(GameActions::Status::InvalidParameters, STR_CANT_POSITION_THIS_HERE, STR_NONE);
     }
 
-    auto* sceneryEntry = GetSmallSceneryEntry(_sceneryType);
+    auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<SmallSceneryEntry>(_sceneryType);
     if (sceneryEntry == nullptr)
     {
         return GameActions::Result(GameActions::Status::InvalidParameters, STR_CANT_POSITION_THIS_HERE, STR_NONE);
@@ -305,7 +306,7 @@ GameActions::Result SmallSceneryPlaceAction::Execute() const
         res.Position.z = surfaceHeight;
     }
 
-    auto* sceneryEntry = GetSmallSceneryEntry(_sceneryType);
+    auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<SmallSceneryEntry>(_sceneryType);
     if (sceneryEntry == nullptr)
     {
         return GameActions::Result(GameActions::Status::InvalidParameters, STR_CANT_POSITION_THIS_HERE, STR_NONE);

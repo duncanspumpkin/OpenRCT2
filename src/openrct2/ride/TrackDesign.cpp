@@ -43,6 +43,7 @@
 #include "../object/LargeSceneryObject.h"
 #include "../object/ObjectList.h"
 #include "../object/ObjectManager.h"
+#include "../object/ObjectManagerMeta.h"
 #include "../object/ObjectRepository.h"
 #include "../object/SmallSceneryObject.h"
 #include "../object/StationObject.h"
@@ -992,7 +993,7 @@ static GameActions::Result TrackDesignPlaceSceneryElementRemoveGhost(
             uint8_t quadrant = (scenery.flags >> 2) + _currentTrackPieceDirection;
             quadrant &= 3;
 
-            auto* sceneryEntry = GetSmallSceneryEntry(entryInfo->Index);
+            auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<SmallSceneryEntry>(entryInfo->Index);
             if (!(!sceneryEntry->HasFlag(SMALL_SCENERY_FLAG_FULL_TILE) && sceneryEntry->HasFlag(SMALL_SCENERY_FLAG_DIAGONAL))
                 && sceneryEntry->HasFlag(
                     SMALL_SCENERY_FLAG_DIAGONAL | SMALL_SCENERY_FLAG_HALF_SPACE | SMALL_SCENERY_FLAG_THREE_QUARTERS))

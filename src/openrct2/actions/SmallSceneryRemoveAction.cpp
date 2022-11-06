@@ -17,6 +17,7 @@
 #include "../localisation/Localisation.h"
 #include "../localisation/StringIds.h"
 #include "../management/Finance.h"
+#include "../object/ObjectManagerMeta.h"
 #include "../object/SmallSceneryObject.h"
 #include "../ride/Ride.h"
 #include "../world/Park.h"
@@ -62,7 +63,7 @@ GameActions::Result SmallSceneryRemoveAction::Query() const
         return GameActions::Result(GameActions::Status::InvalidParameters, STR_CANT_REMOVE_THIS, STR_LAND_NOT_OWNED_BY_PARK);
     }
 
-    auto* entry = GetSmallSceneryEntry(_sceneryType);
+    auto* entry = OpenRCT2::ObjectManager::GetMeta<SmallSceneryEntry>(_sceneryType);
     if (entry == nullptr)
     {
         return GameActions::Result(
@@ -111,7 +112,7 @@ GameActions::Result SmallSceneryRemoveAction::Execute() const
 {
     GameActions::Result res = GameActions::Result();
 
-    auto* entry = GetSmallSceneryEntry(_sceneryType);
+    auto* entry = OpenRCT2::ObjectManager::GetMeta<SmallSceneryEntry>(_sceneryType);
     if (entry == nullptr)
     {
         return GameActions::Result(

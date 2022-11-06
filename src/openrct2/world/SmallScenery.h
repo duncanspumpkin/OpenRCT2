@@ -9,12 +9,7 @@
 
 #pragma once
 
-#include "../object/Object.h"
-
 enum
 {
     MAP_ELEM_SMALL_SCENERY_COLOUR_FLAG_NEEDS_SUPPORTS = (1 << 5),
 };
-
-struct SmallSceneryEntry;
-SmallSceneryEntry* GetSmallSceneryEntry(ObjectEntryIndex entryIndex);

@@ -15,7 +15,7 @@
 #include "../OpenRCT2.h"
 #include "../management/Finance.h"
 #include "../network/network.h"
-#include "../object/ObjectManager.h"
+#include "../object/ObjectManagerMeta.h"
 #include "../object/SmallSceneryObject.h"
 #include "../ride/TrackDesign.h"
 #include "Footpath.h"
@@ -124,19 +124,7 @@ void SmallSceneryElement::SetNeedsSupports()
     Colour[0] |= MAP_ELEM_SMALL_SCENERY_COLOUR_FLAG_NEEDS_SUPPORTS;
 }
 
-SmallSceneryEntry* SmallSceneryElement::GetEntry() const
+const SmallSceneryEntry* SmallSceneryElement::GetEntry() const
 {
-    return GetSmallSceneryEntry(entryIndex);
-}
-
-SmallSceneryEntry* GetSmallSceneryEntry(ObjectEntryIndex entryIndex)
-{
-    SmallSceneryEntry* result = nullptr;
-    auto& objMgr = OpenRCT2::GetContext()->GetObjectManager();
-    auto obj = objMgr.GetLoadedObject(ObjectType::SmallScenery, entryIndex);
-    if (obj != nullptr)
-    {
-        result = static_cast<SmallSceneryEntry*>(obj->GetLegacyData());
-    }
-    return result;
+    return OpenRCT2::ObjectManager::GetMeta<SmallSceneryEntry>(entryIndex);
 }

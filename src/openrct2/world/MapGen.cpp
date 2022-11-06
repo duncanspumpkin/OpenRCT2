@@ -19,6 +19,7 @@
 #include "../localisation/StringIds.h"
 #include "../object/Object.h"
 #include "../object/ObjectManager.h"
+#include "../object/ObjectManagerMeta.h"
 #include "../object/SmallSceneryObject.h"
 #include "../object/TerrainEdgeObject.h"
 #include "../object/TerrainSurfaceObject.h"
@@ -254,7 +255,7 @@ void MapGenGenerate(mapgen_settings* settings)
 
 static void MapGenPlaceTree(ObjectEntryIndex type, const CoordsXY& loc)
 {
-    auto* sceneryEntry = GetSmallSceneryEntry(type);
+    auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<SmallSceneryEntry>(type);
     if (sceneryEntry == nullptr)
     {
         return;
@@ -312,7 +313,7 @@ static void MapGenPlaceTrees()
 
     for (int32_t i = 0; i < object_entry_group_counts[EnumValue(ObjectType::SmallScenery)]; i++)
     {
-        auto* sceneryEntry = GetSmallSceneryEntry(i);
+        auto* sceneryEntry = OpenRCT2::ObjectManager::GetMeta<SmallSceneryEntry>(i);
         auto entry = object_entry_get_object(ObjectType::SmallScenery, i);
 
         if (sceneryEntry == nullptr)
