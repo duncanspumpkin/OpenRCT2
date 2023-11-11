@@ -37,4 +37,6 @@ namespace OpenRCT2::Audio
 
     [[nodiscard]] std::unique_ptr<IAudioContext> CreateAudioContext();
 
+    [[nodiscard]] std::unique_ptr<IAudioContext> CreateAudioContextOpenAl();
+
 } // namespace OpenRCT2::Audio

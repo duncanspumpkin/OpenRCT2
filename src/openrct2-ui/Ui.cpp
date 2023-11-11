@@ -59,7 +59,7 @@ int main(int argc, const char** argv)
             std::shared_ptr<IAudioContext> audioContext;
             try
             {
-                audioContext = ToShared(CreateAudioContext());
+                audioContext = ToShared(CreateAudioContextOpenAl());
             }
             catch (const SDLException& e)
             {
