@@ -195,6 +195,65 @@ namespace OpenRCT2::Audio
         }
     };
 
+    class BufferManager
+    {
+        std::vector<uint32_t> _buffers;
+
+    public:
+        ~BufferManager();
+        uint32_t allocate(const uint8_t* data, uint32_t dataSize, uint32_t sampleRate, bool stereo, uint8_t bits);
+        void deAllocate(uint32_t id);
+        void dispose();
+    };
+    BufferManager::~BufferManager()
+    {
+        dispose();
+    }
+
+    uint32_t BufferManager::allocate(const uint8_t* data, uint32_t dataSize, uint32_t sampleRate, bool stereo, uint8_t bits)
+    {
+        uint32_t id = 0;
+        alGenBuffers(1, &id);
+        _buffers.push_back(id);
+        uint32_t format = 0;
+        if (stereo)
+        {
+            if (bits == 8)
+            {
+                format = AL_FORMAT_STEREO8;
+            }
+            else
+            {
+                format = AL_FORMAT_STEREO16;
+            }
+        }
+        else
+        {
+            if (bits == 8)
+            {
+                format = AL_FORMAT_MONO8;
+            }
+            else
+            {
+                format = AL_FORMAT_MONO16;
+            }
+        }
+        alBufferData(id, format, data, dataSize, sampleRate);
+        return id;
+    }
+
+    void BufferManager::deAllocate(uint32_t id)
+    {
+        alDeleteBuffers(1, &id);
+        _buffers.erase(std::remove(std::begin(_buffers), std::end(_buffers), id));
+    }
+
+    void BufferManager::dispose()
+    {
+        alDeleteBuffers(_buffers.size(), _buffers.data());
+        _buffers.clear();
+    }
+
     class AudioContextOpenAl final : public IAudioContext
     {
     private:
@@ -254,17 +313,25 @@ namespace OpenRCT2::Audio
             alcMakeContextCurrent(_context);
         }
 
+        uint32_t CreateBufferFromCSS(std::unique_ptr<IStream> stream, uint32_t index) override
+        {
+        }
+
+        uint32_t CreateBufferFromWAV(std::unique_ptr<IStream> stream) override
+        {
+        }
+
         IAudioSource* CreateStreamFromCSS(std::unique_ptr<IStream> stream, uint32_t index) override
         {
-            //auto* rw = StreamToSDL2(std::move(stream));
-            //if (rw == nullptr)
+            // auto* rw = StreamToSDL2(std::move(stream));
+            // if (rw == nullptr)
             //{
-            //    return nullptr;
-            //}
+            //     return nullptr;
+            // }
 
-            //try
+            // try
             //{
-            //    auto source = CreateAudioSource(rw, index);
+            //     auto source = CreateAudioSource(rw, index);
 
             //    // Stream will already be in memory, so convert to target format
             //    auto& targetFormat = _audioMixer->GetFormat();
@@ -272,7 +339,7 @@ namespace OpenRCT2::Audio
 
             //    return AddSource(std::move(source));
             //}
-            //catch (const std::exception& e)
+            // catch (const std::exception& e)
             //{
             //    LOG_VERBOSE("Unable to create audio source: %s", e.what());
             //    return nullptr;
@@ -282,15 +349,15 @@ namespace OpenRCT2::Audio
 
         IAudioSource* CreateStreamFromWAV(std::unique_ptr<IStream> stream) override
         {
-            //auto* rw = StreamToSDL2(std::move(stream));
-            //if (rw == nullptr)
+            // auto* rw = StreamToSDL2(std::move(stream));
+            // if (rw == nullptr)
             //{
-            //    return nullptr;
-            //}
+            //     return nullptr;
+            // }
 
-            //try
+            // try
             //{
-            //    auto source = CreateAudioSource(rw);
+            //     auto source = CreateAudioSource(rw);
 
             //    // Load whole stream into memory if small enough
             //    auto dataLength = source->GetLength();
@@ -302,7 +369,7 @@ namespace OpenRCT2::Audio
 
             //    return AddSource(std::move(source));
             //}
-            //catch (const std::exception& e)
+            // catch (const std::exception& e)
             //{
             //    LOG_VERBOSE("Unable to create audio source: %s", e.what());
             //    return nullptr;

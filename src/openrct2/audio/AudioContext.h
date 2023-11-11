@@ -37,6 +37,9 @@ namespace OpenRCT2::Audio
         virtual IAudioSource* CreateStreamFromCSS(std::unique_ptr<IStream> stream, uint32_t index) abstract;
         virtual IAudioSource* CreateStreamFromWAV(std::unique_ptr<IStream> stream) abstract;
 
+        virtual uint32_t CreateBufferFromCSS(std::unique_ptr<IStream> stream, uint32_t index){};
+        virtual uint32_t CreateBufferFromWAV(std::unique_ptr<IStream> stream){};
+
         virtual void StartTitleMusic() abstract;
 
         virtual void ToggleAllSounds() abstract;
