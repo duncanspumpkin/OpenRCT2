@@ -230,7 +230,7 @@ void Park::Initialise()
 {
     auto& gameState = GetGameState();
 
-    Name = FormatStringID(STR_UNNAMED_PARK, nullptr);
+    Name = FormatStringIDLegacy(STR_UNNAMED_PARK, nullptr);
     PluginStorage = {};
     gameState.StaffHandymanColour = COLOUR_BRIGHT_RED;
     gameState.StaffMechanicColour = COLOUR_LIGHT_BLUE;
